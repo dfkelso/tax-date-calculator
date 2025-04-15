@@ -1,0 +1,117 @@
+<h1>Add Form to Job: <%= @job.name %></h1>
+
+<%= form_with(model: [@job, @job_form], local: true) do |form| %>
+  <% if @job_form.errors.any? %>
+    <div class="error-messages">
+      <h2><%= pluralize(@job_form.errors.count, "error") %> prohibited this form from being saved:</h2>
+      <ul>
+        <% @job_form.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <p><strong>Entity Type:</strong> <%= @job.entity_type %></p>
+  </div>
+
+  <div class="field radio-group">
+    <%= form.label :locality_type %>
+    <div class="radio-options">
+      <% @available_locality_types.each do |type| %>
+        <div class="radio-option">
+          <%= form.radio_button :locality_type, type, class: 'locality-type-radio', data: { job_id: @job.id, entity_type: @job.entity_type } %>
+          <%= form.label "locality_type_#{type}", type.titleize %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= form.label :locality %>
+    <%= form.select :locality, [], { include_blank: 'Select a locality type first' }, { class: 'locality-select', disabled: true } %>
+  </div>
+
+  <div class="field">
+    <%= form.label :form_number %>
+    <%= form.select :form_number, [], { include_blank: 'Select a locality first' }, { class: 'form-number-select', disabled: true } %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Add Form" %>
+    <%= link_to 'Cancel', job_path(@job) %>
+  </div>
+<% end %>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const localityTypeRadios = document.querySelectorAll('.locality-type-radio');
+        const localitySelect = document.querySelector('.locality-select');
+        const formNumberSelect = document.querySelector('.form-number-select');
+        const jobId = document.querySelector('.locality-type-radio').dataset.jobId;
+        const entityType = document.querySelector('.locality-type-radio').dataset.entityType;
+
+        // Handle locality type change
+        localityTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const localityType = this.value;
+
+                // Enable and populate locality dropdown
+                fetch(`/jobs/${jobId}/localities?entity_type=${entityType}&locality_type=${localityType}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        localitySelect.innerHTML = '';
+                        localitySelect.disabled = false;
+
+                        // Add default option
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = 'Select a locality';
+                        localitySelect.appendChild(defaultOption);
+
+                        // Add localities
+                        data.forEach(locality => {
+                            const option = document.createElement('option');
+                            option.value = locality;
+                            option.textContent = locality;
+                            localitySelect.appendChild(option);
+                        });
+                    });
+            });
+        });
+
+        // Handle locality change
+        localitySelect.addEventListener('change', function() {
+            const localityType = document.querySelector('.locality-type-radio:checked').value;
+            const locality = this.value;
+
+            if (locality) {
+                // Enable and populate form dropdown
+                fetch(`/jobs/${jobId}/form_numbers?entity_type=${entityType}&locality_type=${localityType}&locality=${locality}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        formNumberSelect.innerHTML = '';
+                        formNumberSelect.disabled = false;
+
+                        // Add default option
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = '';
+                        defaultOption.textContent = 'Select a form';
+                        formNumberSelect.appendChild(defaultOption);
+
+                        // Add form numbers
+                        data.forEach(formNumber => {
+                            const option = document.createElement('option');
+                            option.value = formNumber;
+                            option.textContent = formNumber;
+                            formNumberSelect.appendChild(option);
+                        });
+                    });
+            } else {
+                formNumberSelect.innerHTML = '';
+                formNumberSelect.disabled = true;
+            }
+        });
+    });
+</script>

@@ -1,0 +1,33 @@
+<h1>Tax Jobs</h1>
+
+<div class="actions">
+  <%= link_to 'Create New Job', new_job_path, class: 'button' %>
+</div>
+
+<% if @jobs.any? %>
+  <table>
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Entity Type</th>
+      <th>Coverage Period</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @jobs.each do |job| %>
+      <tr>
+        <td><%= job.name %></td>
+        <td><%= job.entity_type %></td>
+        <td><%= job.coverage_start_date.strftime('%m/%d/%Y') %> - <%= job.coverage_end_date.strftime('%m/%d/%Y') %></td>
+        <td>
+          <%= link_to 'View', job_path(job) %>
+          <%= link_to 'Delete', job_path(job), method: :delete, data: { confirm: 'Are you sure? This will delete all associated forms.' }, class: 'delete-link' %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No jobs created yet.</p>
+<% end %>

@@ -1,0 +1,45 @@
+<h1><%= @job.name %></h1>
+
+<div class="job-details">
+  <p><strong>Entity Type:</strong> <%= @job.entity_type %></p>
+  <p><strong>Coverage Period:</strong> <%= @job.coverage_start_date.strftime('%m/%d/%Y') %> - <%= @job.coverage_end_date.strftime('%m/%d/%Y') %></p>
+</div>
+
+<div class="actions">
+  <%= link_to 'Add Form', new_job_job_form_path(@job), class: 'button' %>
+  <%= link_to 'Back to Jobs', jobs_path %>
+  <%= link_to 'Delete Job', job_path(@job), method: :delete, data: { confirm: 'Are you sure? This will delete all associated forms.' }, class: 'delete-button' %>
+</div>
+
+<h2>Forms</h2>
+
+<% if @job_forms.any? %>
+  <table>
+    <thead>
+    <tr>
+      <th>Form Number</th>
+      <th>Locality Type</th>
+      <th>Locality</th>
+      <th>Due Date</th>
+      <th>Extension Due Date</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @job_forms.each do |form| %>
+      <tr>
+        <td><%= form.form_number %></td>
+        <td><%= form.locality_type %></td>
+        <td><%= form.locality %></td>
+        <td><%= form.due_date&.strftime('%m/%d/%Y') %></td>
+        <td><%= form.extension_due_date&.strftime('%m/%d/%Y') if form.extension_due_date %></td>
+        <td>
+          <%= link_to 'Delete', job_job_form_path(@job, form), method: :delete, data: { confirm: 'Are you sure?' }, class: 'delete-link' %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No forms added yet.</p>
+<% end %>

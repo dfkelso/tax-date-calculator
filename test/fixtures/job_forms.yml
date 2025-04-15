@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  job: one
+  form_number: MyString
+  entity_type: MyString
+  locality_type: MyString
+  locality: MyString
+  due_date: 2025-04-15
+  extension_due_date: 2025-04-15
+
+two:
+  job: two
+  form_number: MyString
+  entity_type: MyString
+  locality_type: MyString
+  locality: MyString
+  due_date: 2025-04-15
+  extension_due_date: 2025-04-15

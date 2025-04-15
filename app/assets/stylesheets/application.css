@@ -1,0 +1,39 @@
+/* Radio button styling */
+.radio-group {
+    margin-bottom: 20px;
+}
+
+.radio-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 5px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+}
+
+.radio-option input[type="radio"] {
+    margin-right: 5px;
+}
+
+/* Delete button styling */
+.delete-link {
+    color: #d9534f;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.delete-button {
+    display: inline-block;
+    background: #d9534f;
+    color: white;
+    padding: 8px 16px;
+    margin-right: 10px;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}

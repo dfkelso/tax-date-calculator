@@ -1,0 +1,2 @@
+module JobFormsHelper
+end

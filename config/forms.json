@@ -1,0 +1,873 @@
+
+{
+  "forms": [
+    {
+      "formNumber": "1040",
+      "formName": "U.S. Individual Income Tax Return",
+      "localityType": "federal",
+      "locality": "United States",
+      "entityType": "individual",
+      "parentFormNumbers": ["1040"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "4868",
+        "formName": "Application for Automatic Extension of Time to File U.S. Individual Income Tax Return",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 4,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "1065",
+      "formName": "U.S. Return of Partnership Income",
+      "localityType": "federal",
+      "locality": "United States",
+      "entityType": "partnership",
+      "parentFormNumbers": ["1065"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "7004",
+        "formName": "Application for Automatic Extension of Time to File Certain Business Income Tax Returns",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "1120S",
+      "formName": "U.S. Income Tax Return for an S Corporation",
+      "localityType": "federal",
+      "locality": "United States",
+      "entityType": "scorp",
+      "parentFormNumbers": ["1120S"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "7004",
+        "formName": "Application for Automatic Extension of Time to File Certain Business Income Tax Returns",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "1120",
+      "formName": "U.S. Corporation Income Tax Return",
+      "localityType": "federal",
+      "locality": "United States",
+      "entityType": "corporation",
+      "parentFormNumbers": ["1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "7004",
+        "formName": "Application for Automatic Extension of Time to File Certain Business Income Tax Returns",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 4,
+                "dayOfMonth": 15
+              }
+            }
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 10,
+                "dayOfMonth": 15
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "AL40",
+      "formName": "Alabama Individual Income Tax Return",
+      "localityType": "state",
+      "locality": "Alabama",
+      "entityType": "individual",
+      "parentFormNumbers": ["1040"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "4868A",
+        "formName": "Alabama Application for Automatic Extension of Time for Filing Alabama Income Tax Return",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 4,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "AL65",
+      "formName": "Alabama Partnership/LLC Return of Income",
+      "localityType": "state",
+      "locality": "Alabama",
+      "entityType": "partnership",
+      "parentFormNumbers": ["1065"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "7004A",
+        "formName": "Alabama Business Income Tax Extension",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "AL20S",
+      "formName": "Alabama S Corporation Income Tax Return",
+      "localityType": "state",
+      "locality": "Alabama",
+      "entityType": "scorp",
+      "parentFormNumbers": ["1120S"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "7004A",
+        "formName": "Alabama Business Income Tax Extension",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "AL20C",
+      "formName": "Alabama Corporation Income Tax Return",
+      "localityType": "state",
+      "locality": "Alabama",
+      "entityType": "corporation",
+      "parentFormNumbers": ["1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "7004A",
+        "formName": "Alabama Business Income Tax Extension",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 4,
+                "dayOfMonth": 15
+              }
+            }
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 10,
+                "dayOfMonth": 15
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "PPT",
+      "formName": "Alabama Business Privilege Tax Return",
+      "localityType": "state",
+      "locality": "Alabama",
+      "entityType": "smllc",
+      "parentFormNumbers": ["1040", "1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "BPT-E",
+        "formName": "Alabama Business Privilege Tax Extension",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "500",
+      "formName": "Georgia Individual Income Tax Return",
+      "localityType": "state",
+      "locality": "Georgia",
+      "entityType": "individual",
+      "parentFormNumbers": ["1040"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "IT-303",
+        "formName": "Georgia Application for Extension of Time for Filing State Income Tax Returns",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 4,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "700",
+      "formName": "Georgia Partnership Income Tax Return",
+      "localityType": "state",
+      "locality": "Georgia",
+      "entityType": "partnership",
+      "parentFormNumbers": ["1065"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "IT-303",
+        "formName": "Georgia Application for Extension of Time for Filing State Income Tax Returns",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "600S",
+      "formName": "Georgia S Corporation Income Tax Return",
+      "localityType": "state",
+      "locality": "Georgia",
+      "entityType": "scorp",
+      "parentFormNumbers": ["1120S"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "IT-303",
+        "formName": "Georgia Application for Extension of Time for Filing State Income Tax Returns",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "600",
+      "formName": "Georgia Corporation Income Tax Return",
+      "localityType": "state",
+      "locality": "Georgia",
+      "entityType": "corporation",
+      "parentFormNumbers": ["1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "IT-303",
+        "formName": "Georgia Application for Extension of Time for Filing State Income Tax Returns",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 4,
+                "dayOfMonth": 15
+              }
+            }
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 10,
+                "dayOfMonth": 15
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "CL-1",
+      "formName": "Georgia Annual Registration",
+      "localityType": "state",
+      "locality": "Georgia",
+      "entityType": "smllc",
+      "parentFormNumbers": ["1040", "1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "CL-1E",
+        "formName": "Georgia Annual Registration Extension",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearStart": 4,
+            "dayOfMonth": 1
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "05-158",
+      "formName": "Texas Franchise Tax Report - Short Form",
+      "localityType": "state",
+      "locality": "Texas",
+      "entityType": "corporation",
+      "parentFormNumbers": ["1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "05-164",
+        "formName": "Texas Franchise Tax Extension Request",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearStart": 5,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearStart": 11,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "05-158",
+      "formName": "Texas Franchise Tax Report - Short Form",
+      "localityType": "state",
+      "locality": "Texas",
+      "entityType": "scorp",
+      "parentFormNumbers": ["1120S"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "05-164",
+        "formName": "Texas Franchise Tax Extension Request",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearStart": 5,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearStart": 11,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "05-169",
+      "formName": "Texas Franchise Tax EZ Computation Report",
+      "localityType": "state",
+      "locality": "Texas",
+      "entityType": "smllc",
+      "parentFormNumbers": ["1040", "1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "05-164",
+        "formName": "Texas Franchise Tax Extension Request",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearStart": 5,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearStart": 11,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "FAE170",
+      "formName": "Tennessee Franchise & Excise Tax Return",
+      "localityType": "state",
+      "locality": "Tennessee",
+      "entityType": "corporation",
+      "parentFormNumbers": ["1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "FAE173",
+        "formName": "Tennessee Franchise & Excise Tax Extension",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 4,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "FAE170",
+      "formName": "Tennessee Franchise & Excise Tax Return",
+      "localityType": "state",
+      "locality": "Tennessee",
+      "entityType": "scorp",
+      "parentFormNumbers": ["1120S"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "FAE173",
+        "formName": "Tennessee Franchise & Excise Tax Extension",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 4,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "FAE170",
+      "formName": "Tennessee Franchise & Excise Tax Return",
+      "localityType": "state",
+      "locality": "Tennessee",
+      "entityType": "smllc",
+      "parentFormNumbers": ["1040", "1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "FAE173",
+        "formName": "Tennessee Franchise & Excise Tax Extension",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 4,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "1",
+      "formName": "Massachusetts Resident Income Tax Return",
+      "localityType": "state",
+      "locality": "Massachusetts",
+      "entityType": "individual",
+      "parentFormNumbers": ["1040"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "M-4868",
+        "formName": "Massachusetts Application for Extension of Time to File",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 4,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "3",
+      "formName": "Massachusetts Partnership Return",
+      "localityType": "state",
+      "locality": "Massachusetts",
+      "entityType": "partnership",
+      "parentFormNumbers": ["1065"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "M-8736",
+        "formName": "Massachusetts Application for Extension of Time to File Partnership Return",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "355S",
+      "formName": "Massachusetts S Corporation Excise Tax Return",
+      "localityType": "state",
+      "locality": "Massachusetts",
+      "entityType": "scorp",
+      "parentFormNumbers": ["1120S"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "M-8736",
+        "formName": "Massachusetts Application for Extension of Time to File Corporation Return",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "355",
+      "formName": "Massachusetts Corporate Excise Tax Return",
+      "localityType": "state",
+      "locality": "Massachusetts",
+      "entityType": "corporation",
+      "parentFormNumbers": ["1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "M-8736",
+        "formName": "Massachusetts Application for Extension of Time to File Corporation Return",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 4,
+                "dayOfMonth": 15
+              }
+            }
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 10,
+                "dayOfMonth": 15
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "540",
+      "formName": "California Resident Income Tax Return",
+      "localityType": "state",
+      "locality": "California",
+      "entityType": "individual",
+      "parentFormNumbers": ["1040"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "FTB 3519",
+        "formName": "Payment for Automatic Extension for Individuals",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 4,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "565",
+      "formName": "California Partnership Return of Income",
+      "localityType": "state",
+      "locality": "California",
+      "entityType": "partnership",
+      "parentFormNumbers": ["1065"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "FTB 3538",
+        "formName": "Payment for Automatic Extension for LLPs and Partnerships",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "100S",
+      "formName": "California S Corporation Franchise or Income Tax Return",
+      "localityType": "state",
+      "locality": "California",
+      "entityType": "scorp",
+      "parentFormNumbers": ["1120S"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "FTB 3539",
+        "formName": "Payment for Automatic Extension for Corporations and Exempt Organizations",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "100",
+      "formName": "California Corporation Franchise or Income Tax Return",
+      "localityType": "state",
+      "locality": "California",
+      "entityType": "corporation",
+      "parentFormNumbers": ["1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "FTB 3539",
+        "formName": "Payment for Automatic Extension for Corporations and Exempt Organizations",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 4,
+                "dayOfMonth": 15
+              }
+            }
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 10,
+                "dayOfMonth": 15
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "568",
+      "formName": "Limited Liability Company Return of Income",
+      "localityType": "state",
+      "locality": "California",
+      "entityType": "smllc",
+      "parentFormNumbers": ["1040", "1120"],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "FTB 3538",
+        "formName": "Payment for Automatic Extension for LLCs",
+        "piggybackFed": true
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [2023, 2024],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    }
+  ]
+}
