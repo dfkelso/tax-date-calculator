@@ -8,10 +8,12 @@ class JobFormsController < ApplicationController
 
   def new
     @job_form = @job.job_forms.build
+    @job_form.entity_type = @job.entity_type
   end
 
   def create
     @job_form = @job.job_forms.build(job_form_params)
+    @job_form.entity_type = @job.entity_type # Explicitly set entity_type
 
     # Calculate due dates using our service
     calculator = DueDateCalculator.new
@@ -41,6 +43,30 @@ class JobFormsController < ApplicationController
     @job_form = @job.job_forms.find(params[:id])
     @job_form.destroy
     redirect_to job_path(@job), notice: 'Form was successfully deleted.'
+  end
+
+  def localities
+    forms_repo = FormsRepository.new
+    localities = forms_repo.all_forms
+                           .select { |form| form['entityType'] == params[:entity_type] && form['localityType'] == params[:locality_type] }
+                           .map { |form| form['locality'] }
+                           .uniq
+
+    render json: localities
+  end
+
+  def form_numbers
+    forms_repo = FormsRepository.new
+    form_numbers = forms_repo.all_forms
+                             .select { |form|
+                               form['entityType'] == params[:entity_type] &&
+                                 form['localityType'] == params[:locality_type] &&
+                                 form['locality'] == params[:locality]
+                             }
+                             .map { |form| form['formNumber'] }
+                             .uniq
+
+    render json: form_numbers
   end
 
   private
@@ -74,29 +100,4 @@ class JobFormsController < ApplicationController
                                       .map { |form| form['locality'] }
                                       .uniq
   end
-end
-
-# Add these methods to the JobFormsController
-def localities
-  forms_repo = FormsRepository.new
-  localities = forms_repo.all_forms
-                         .select { |form| form['entityType'] == params[:entity_type] && form['localityType'] == params[:locality_type] }
-                         .map { |form| form['locality'] }
-                         .uniq
-
-  render json: localities
-end
-
-def form_numbers
-  forms_repo = FormsRepository.new
-  form_numbers = forms_repo.all_forms
-                           .select { |form|
-                             form['entityType'] == params[:entity_type] &&
-                               form['localityType'] == params[:locality_type] &&
-                               form['locality'] == params[:locality]
-                           }
-                           .map { |form| form['formNumber'] }
-                           .uniq
-
-  render json: form_numbers
 end

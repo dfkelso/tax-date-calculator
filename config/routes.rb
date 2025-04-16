@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   root 'jobs#index'
 
   resources :jobs do
-    resources :job_forms, only: [:index, :new, :create, :destroy]
+    resources :job_forms
 
     # AJAX routes for form filtering
     get 'localities', to: 'job_forms#localities'

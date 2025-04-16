@@ -8,7 +8,7 @@
 <div class="actions">
   <%= link_to 'Add Form', new_job_job_form_path(@job), class: 'button' %>
   <%= link_to 'Back to Jobs', jobs_path %>
-  <%= link_to 'Delete Job', job_path(@job), method: :delete, data: { confirm: 'Are you sure? This will delete all associated forms.' }, class: 'delete-button' %>
+  <%= button_to 'Delete Job', job_path(@job), method: :delete, form: { data: { turbo_confirm: 'Are you sure? This will delete all associated forms.' } }, class: 'delete-button' %>
 </div>
 
 <h2>Forms</h2>
@@ -34,7 +34,7 @@
         <td><%= form.due_date&.strftime('%m/%d/%Y') %></td>
         <td><%= form.extension_due_date&.strftime('%m/%d/%Y') if form.extension_due_date %></td>
         <td>
-          <%= link_to 'Delete', job_job_form_path(@job, form), method: :delete, data: { confirm: 'Are you sure?' }, class: 'delete-link' %>
+          <%= button_to 'Delete', job_job_form_path(@job, form), method: :delete, form: { data: { turbo_confirm: 'Are you sure?' } }, class: 'delete-link' %>
         </td>
       </tr>
     <% end %>
