@@ -1,3 +1,4 @@
+# app/controllers/admin/forms_controller.rb
 class Admin::FormsController < Admin::BaseController
   before_action :set_form, only: [:edit, :update, :destroy, :preview_dates]
   before_action :set_form_manager, only: [:index, :new, :create, :edit, :update, :destroy]
@@ -5,6 +6,40 @@ class Admin::FormsController < Admin::BaseController
   def index
     @forms = @form_manager.all_forms
     @preview_year = params[:preview_year] || 2025
+
+    respond_to do |format|
+      format.html
+      format.json do
+        # Transform the forms data for the grid
+        forms_with_dates = @forms.map.with_index do |form, idx|
+          form_with_dates = form.dup
+          form_with_dates['id'] = idx + 1
+
+          # Calculate dates if preview_year is set
+          if params[:preview_year].present?
+            calculator = DueDateCalculator.new
+            preview_dates = calculator.calculate_dates(
+              form['formNumber'],
+              form['entityType'],
+              form['localityType'],
+              form['locality'],
+              Date.new(@preview_year.to_i, 1, 1),
+              Date.new(@preview_year.to_i, 12, 31)
+            )
+
+            if preview_dates
+              form_with_dates['dueDate'] = preview_dates[:due_date]
+              form_with_dates['extensionDueDate'] = preview_dates[:extension_due_date]
+              form_with_dates['approximated'] = preview_dates[:approximated]
+            end
+          end
+
+          form_with_dates
+        end
+
+        render json: forms_with_dates
+      end
+    end
   end
 
   def new
@@ -65,6 +100,14 @@ class Admin::FormsController < Admin::BaseController
         end_date
       )
     end
+  end
+
+  def export_json
+    form_manager = JsonFormManager.new
+    send_data form_manager.export_json,
+              type: 'application/json',
+              disposition: 'attachment',
+              filename: "tax_forms_#{Date.today.strftime('%Y%m%d')}.json"
   end
 
   private

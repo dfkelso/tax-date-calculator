@@ -1,3 +1,4 @@
+# config/routes.rb
 Rails.application.routes.draw do
   root 'jobs#index'
 
@@ -11,7 +12,7 @@ Rails.application.routes.draw do
 
   # Admin interface routes
   namespace :admin do
-    root to: 'base#index'
+    root to: 'forms#index'  # Changed from 'base#index' to 'forms#index'
 
     resources :forms do
       member do
@@ -21,8 +22,7 @@ Rails.application.routes.draw do
       resources :calculation_rules
     end
 
-    # JSON export/import
-    get 'export_json', to: 'base#export_json'
-    post 'import_json', to: 'base#import_json'
+    # JSON export only
+    get 'export_json', to: 'forms#export_json'
   end
 end

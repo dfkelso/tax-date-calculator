@@ -1,0 +1,105 @@
+/* Custom styles for Tabulator */
+
+/* Header styling */
+.tabulator .tabulator-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+}
+
+.tabulator .tabulator-header .tabulator-col {
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+}
+
+.tabulator .tabulator-header .tabulator-col.tabulator-sortable:hover {
+    background-color: #e9ecef;
+}
+
+/* Row styling */
+.tabulator .tabulator-table .tabulator-row {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.tabulator .tabulator-table .tabulator-row:nth-child(even) {
+    background-color: #f7f7f7;
+}
+
+.tabulator .tabulator-table .tabulator-row.tabulator-selected {
+    background-color: #d3e4f7 !important;
+}
+
+.tabulator .tabulator-table .tabulator-row:hover {
+    background-color: #e9ecef;
+}
+
+/* Cell styling */
+.tabulator .tabulator-table .tabulator-cell {
+    padding: 10px;
+    border-right: 1px solid #dee2e6;
+}
+
+.tabulator .tabulator-table .tabulator-cell.tabulator-editing {
+    border: 1px solid #4c8bf5;
+    padding: 0;
+}
+
+.tabulator .tabulator-table .tabulator-cell.tabulator-editing input,
+.tabulator .tabulator-table .tabulator-cell.tabulator-editing select {
+    padding: 7px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+/* Footer styling */
+.tabulator .tabulator-footer {
+    background-color: #f8f9fa;
+    border-top: 2px solid #dee2e6;
+    padding: 5px 10px;
+}
+
+.tabulator .tabulator-footer .tabulator-paginator {
+    font-size: 0.9em;
+}
+
+.tabulator .tabulator-footer .tabulator-page {
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+    color: #333;
+    padding: 5px 10px;
+    margin: 0 2px;
+    border-radius: 3px;
+}
+
+.tabulator .tabulator-footer .tabulator-page.active {
+    background-color: #4c8bf5;
+    color: #fff;
+    border-color: #4c8bf5;
+}
+
+.tabulator .tabulator-footer .tabulator-page:hover:not(.disabled):not(.active) {
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
+/* Responsive collapse styling */
+.tabulator-row .tabulator-responsive-collapse td {
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Filter styling */
+.tabulator-header-filter input {
+    width: 100%;
+    border: 1px solid #dee2e6;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+/* Loading overlay */
+.tabulator .tabulator-loading {
+    background: rgba(255, 255, 255, 0.8);
+    color: #333;
+}

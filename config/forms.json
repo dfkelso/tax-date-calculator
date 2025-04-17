@@ -16,7 +16,35 @@
         "piggybackFed": false
       },
       "calculationBase": "end",
-      "calculationRules": []
+      "calculationRules": [
+        {
+          "effectiveYears": [
+            2023,
+            2024
+          ],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        },
+        {
+          "effectiveYears": [
+            2020
+          ],
+          "dueDate": {
+            "monthsAfterYearEnd": 5,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ]
     },
     {
       "formNumber": "AL40",
@@ -891,24 +919,6 @@
           }
         }
       ]
-    },
-    {
-      "formNumber": "1041",
-      "formName": "Fiduciary Tax Return",
-      "localityType": "federal",
-      "locality": "United States",
-      "entityType": "individual",
-      "parentFormNumbers": [
-        "1041"
-      ],
-      "owner": "MPM",
-      "calculationBase": "end",
-      "calculationRules": [],
-      "extension": {
-        "formNumber": "4868",
-        "formName": "Application for Automatic Extension of Time to File U.S. FiduciARY Income Tax Return",
-        "piggybackFed": false
-      }
     }
   ]
 }
