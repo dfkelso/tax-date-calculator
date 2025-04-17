@@ -1,0 +1,120 @@
+<h1>Edit Calculation Rule for Form: <%= @form['formNumber'] %></h1>
+
+<%= form_with(url: admin_form_calculation_rule_path(params[:form_id], params[:id]), method: :patch) do |form| %>
+  <div class="form-section">
+    <h3>Effective Years</h3>
+
+    <div class="field">
+      <%= form.label :effective_years, "Effective Years (comma separated):" %>
+      <%= form.text_field :effective_years, value: @rule['effectiveYears'].join(', '), required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>Due Date</h3>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :due_months_after_year_end, "Months After Year End:" %>
+        <%= form.number_field :due_months_after_year_end, value: @rule.dig('dueDate', 'monthsAfterYearEnd'), min: 0, max: 24, required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :due_day_of_month, "Day of Month:" %>
+        <%= form.number_field :due_day_of_month, value: @rule.dig('dueDate', 'dayOfMonth'), min: 1, max: 31, required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>Extension Due Date</h3>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :extension_months_after_year_end, "Months After Year End:" %>
+        <%= form.number_field :extension_months_after_year_end, value: @rule.dig('extensionDueDate', 'monthsAfterYearEnd'), min: 0, max: 24, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :extension_day_of_month, "Day of Month:" %>
+        <%= form.number_field :extension_day_of_month, value: @rule.dig('extensionDueDate', 'dayOfMonth'), min: 1, max: 31, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+    </div>
+  </div>
+
+  <%
+    fiscal_month = nil
+    if @rule.dig('dueDate', 'fiscalYearExceptions')
+      fiscal_month = @rule.dig('dueDate', 'fiscalYearExceptions').keys.first&.to_i
+    end
+  %>
+
+  <div class="form-section">
+    <h3>Fiscal Year Exception</h3>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :fiscal_year_exception_month, "Month (1-12):" %>
+        <%= form.number_field :fiscal_year_exception_month, value: fiscal_month, min: 1, max: 12, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :fiscal_due_months_after_year_end, "Due Date - Months After Year End:" %>
+        <%
+          fiscal_due_months = nil
+          if fiscal_month && @rule.dig('dueDate', 'fiscalYearExceptions')
+            month_key = fiscal_month.to_s.rjust(2, '0')
+            fiscal_due_months = @rule.dig('dueDate', 'fiscalYearExceptions', month_key, 'monthsAfterYearEnd')
+          end
+        %>
+        <%= form.number_field :fiscal_due_months_after_year_end, value: fiscal_due_months, min: 0, max: 24, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :fiscal_due_day_of_month, "Due Date - Day of Month:" %>
+        <%
+          fiscal_due_day = nil
+          if fiscal_month && @rule.dig('dueDate', 'fiscalYearExceptions')
+            month_key = fiscal_month.to_s.rjust(2, '0')
+            fiscal_due_day = @rule.dig('dueDate', 'fiscalYearExceptions', month_key, 'dayOfMonth')
+          end
+        %>
+        <%= form.number_field :fiscal_due_day_of_month, value: fiscal_due_day, min: 1, max: 31, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :fiscal_extension_months_after_year_end, "Extension - Months After Year End:" %>
+        <%
+          fiscal_ext_months = nil
+          if fiscal_month && @rule.dig('extensionDueDate', 'fiscalYearExceptions')
+            month_key = fiscal_month.to_s.rjust(2, '0')
+            fiscal_ext_months = @rule.dig('extensionDueDate', 'fiscalYearExceptions', month_key, 'monthsAfterYearEnd')
+          end
+        %>
+        <%= form.number_field :fiscal_extension_months_after_year_end, value: fiscal_ext_months, min: 0, max: 24, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :fiscal_extension_day_of_month, "Extension - Day of Month:" %>
+        <%
+          fiscal_ext_day = nil
+          if fiscal_month && @rule.dig('extensionDueDate', 'fiscalYearExceptions')
+            month_key = fiscal_month.to_s.rjust(2, '0')
+            fiscal_ext_day = @rule.dig('extensionDueDate', 'fiscalYearExceptions', month_key, 'dayOfMonth')
+          end
+        %>
+        <%= form.number_field :fiscal_extension_day_of_month, value: fiscal_ext_day, min: 1, max: 31, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" style="margin-top: 20px;">
+    <%= form.submit "Update Rule", class: "button", style: "padding: 10px 20px;" %>
+    <a href="<%= edit_admin_form_path(params[:form_id]) %>" class="button" style="padding: 10px 20px;">Cancel</a>
+    <%= button_to "Delete Rule", admin_form_calculation_rule_path(params[:form_id], params[:id]), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "button", style: "background-color: #d9534f; padding: 10px 20px;" %>
+  </div>
+<% end %>

@@ -1,0 +1,49 @@
+<h1>Add Calculation Rule</h1>
+
+<%= form_with(url: admin_form_calculation_rules_path(params[:form_id]), method: :post) do |form| %>
+  <div class="form-section">
+    <h3>Effective Years</h3>
+
+    <div class="field">
+      <%= form.label :effective_years, "Effective Years (comma separated):" %>
+      <%= form.text_field :effective_years, placeholder: "e.g. 2023, 2024, 2025", required: true, style: "width: 100%;" %>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>Due Date</h3>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :due_months_after_year_end, "Months After Year End:" %>
+        <%= form.number_field :due_months_after_year_end, min: 0, max: 24, required: true, style: "width: 100%;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :due_day_of_month, "Day of Month:" %>
+        <%= form.number_field :due_day_of_month, min: 1, max: 31, value: 15, required: true, style: "width: 100%;" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>Extension Due Date</h3>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :extension_months_after_year_end, "Months After Year End:" %>
+        <%= form.number_field :extension_months_after_year_end, min: 0, max: 24, style: "width: 100%;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :extension_day_of_month, "Day of Month:" %>
+        <%= form.number_field :extension_day_of_month, min: 1, max: 31, value: 15, style: "width: 100%;" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Add Rule", class: "button" %>
+    <a href="<%= edit_admin_form_path(params[:form_id]) %>" class="button">Cancel</a>
+  </div>
+<% end %>

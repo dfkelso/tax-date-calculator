@@ -1,0 +1,44 @@
+<h1>Preview Due Dates for Form: <%= @form['formNumber'] %></h1>
+
+<div class="form-info">
+  <p><strong>Entity Type:</strong> <%= @form['entityType'] %></p>
+  <p><strong>Locality:</strong> <%= @form['localityType'] %> - <%= @form['locality'] %></p>
+  <p><strong>Calculation Base:</strong> <%= @form['calculationBase'] || 'end' %></p>
+</div>
+
+<div class="form-section">
+  <h3>Preview for Year: <%= @preview_year || 2025 %></h3>
+
+  <% if @preview_dates %>
+    <div class="preview-results">
+      <p><strong>Due Date:</strong> <%= @preview_dates[:due_date]&.strftime('%B %d, %Y') || 'Not calculated' %></p>
+
+      <% if @preview_dates[:extension_due_date] %>
+        <p><strong>Extension Due Date:</strong> <%= @preview_dates[:extension_due_date].strftime('%B %d, %Y') %></p>
+      <% else %>
+        <p><strong>Extension Due Date:</strong> Not calculated</p>
+      <% end %>
+
+      <% if @preview_dates[:approximated] %>
+        <p class="warning"><strong>Note:</strong> These dates are approximated based on the nearest available year rule.</p>
+      <% end %>
+    </div>
+  <% else %>
+    <p>Select a year to preview due dates.</p>
+  <% end %>
+
+  <%= form_with(url: preview_dates_admin_form_path(@form['id'] || params[:id]), method: :get) do |form| %>
+    <div class="field">
+      <%= form.label :year, "Preview Year:" %>
+      <%= form.number_field :year, value: @preview_year || 2025, min: 2000, max: 2100 %>
+    </div>
+
+    <div class="actions">
+      <%= form.submit "Preview Dates" %>
+    </div>
+  <% end %>
+</div>
+
+<div class="actions">
+  <a href="<%= edit_admin_form_path(params[:id]) %>" class="button">Back to Edit Form</a>
+</div>

@@ -19,6 +19,30 @@
 </head>
 
 <body>
-<%= yield %>
+<header style="background-color: #333; color: white; padding: 10px 0;">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="margin: 0; font-size: 1.5rem;">Tax Date Calculator</h1>
+    <nav>
+      <a href="<%= root_path %>" style="color: white; margin-right: 15px; text-decoration: none;">Home</a>
+      <a href="<%= admin_root_path %>" style="color: white; text-decoration: none;">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<div style="max-width: 1200px; margin: 20px auto; padding: 0 20px;">
+  <% if notice %>
+    <div style="background-color: #dff0d8; color: #3c763d; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+      <%= notice %>
+    </div>
+  <% end %>
+
+  <% if alert %>
+    <div style="background-color: #f2dede; color: #a94442; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+      <%= alert %>
+    </div>
+  <% end %>
+
+  <%= yield %>
+</div>
 </body>
 </html>

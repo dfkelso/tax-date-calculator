@@ -1,0 +1,156 @@
+<h1>Edit Tax Form: <%= @form['formNumber'] %></h1>
+
+<div class="actions" style="margin-bottom: 20px;">
+  <a href="<%= new_admin_form_calculation_rule_path(params[:id]) %>" class="button" style="padding: 10px 20px;">Add Calculation Rule</a>
+</div>
+
+<%= form_with(url: admin_form_path(params[:id]), method: :patch) do |form| %>
+  <div class="form-section">
+    <h3>Basic Information</h3>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :form_number, "Form Number:" %>
+        <%= form.text_field :form_number, value: @form['formNumber'], required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :form_name, "Form Name:" %>
+        <%= form.text_field :form_name, value: @form['formName'], required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :entity_type, "Entity Type:" %>
+        <%= form.select :entity_type, @available_entity_types, { selected: @form['entityType'] }, { required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" } %>
+      </div>
+
+      <div class="field">
+        <%= form.label :locality_type, "Locality Type:" %>
+        <%= form.select :locality_type, @available_locality_types, { selected: @form['localityType'] }, { required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" } %>
+      </div>
+
+      <div class="field">
+        <%= form.label :locality, "Locality:" %>
+        <%= form.text_field :locality, value: @form['locality'], required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field">
+        <% is_parent = @form['parentFormNumbers'] && @form['parentFormNumbers'].include?(@form['formNumber']) %>
+        <%= form.label :is_parent, "Is Parent Form?" %>
+        <%= form.check_box :is_parent, checked: is_parent, onchange: "toggleParentForm(this)" %>
+      </div>
+
+      <div class="field" id="parent_form_field">
+        <%= form.label :parent_form_number, "Parent Form:" %>
+        <%= form.select :parent_form_number,
+                        @parent_forms.map { |f| [f['formNumber'], f['formNumber']] },
+                        { selected: (@form['parentFormNumbers']&.first || ""), include_blank: "Select Parent Form" },
+                        { style: "width: 100%; padding: 8px; box-sizing: border-box;" } %>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :owner, "Owner:" %>
+        <%= form.text_field :owner, value: @form['owner'] || "MPM", style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :calculation_base, "Calculation Base:" %>
+        <%= form.select :calculation_base, [["End", "end"], ["Start", "start"]], { selected: @form['calculationBase'] || "end" }, { style: "width: 100%; padding: 8px; box-sizing: border-box;" } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>Extension Information</h3>
+
+    <div class="field-group">
+      <div class="field">
+        <%= form.label :extension_form_number, "Extension Form Number:" %>
+        <%= form.text_field :extension_form_number, value: @form.dig('extension', 'formNumber'), style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :extension_form_name, "Extension Form Name:" %>
+        <%= form.text_field :extension_form_name, value: @form.dig('extension', 'formName'), style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+      </div>
+
+      <div class="field">
+        <%= form.label :piggyback_fed, "Piggyback Fed?" %>
+        <%= form.check_box :piggyback_fed, checked: @form.dig('extension', 'piggybackFed') %>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" style="margin: 20px 0;">
+    <%= form.submit "Update Form", class: "button", style: "padding: 10px 20px;" %>
+    <a href="<%= admin_forms_path %>" class="button" style="padding: 10px 20px;">Back to List</a>
+    <%= button_to "Delete Form", admin_form_path(params[:id]), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this form?" }, class: "button", style: "background-color: #d9534f; padding: 10px 20px;" %>
+  </div>
+<% end %>
+
+<div class="form-section">
+  <h3>Calculation Rules</h3>
+
+  <% if @form['calculationRules'] && @form['calculationRules'].any? %>
+    <% @form['calculationRules'].each_with_index do |rule, index| %>
+      <div class="calculation-rule" style="background-color: #f7f7f7; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+        <h4>Rule #<%= index + 1 %></h4>
+
+        <p><strong>Effective Years:</strong> <%= rule['effectiveYears'].join(', ') %></p>
+
+        <p><strong>Due Date:</strong> <%= rule.dig('dueDate', 'monthsAfterYearEnd') %> months after year end, day <%= rule.dig('dueDate', 'dayOfMonth') %></p>
+
+        <% if rule.dig('extensionDueDate') %>
+          <p><strong>Extension Due Date:</strong> <%= rule.dig('extensionDueDate', 'monthsAfterYearEnd') %> months after year end, day <%= rule.dig('extensionDueDate', 'dayOfMonth') %></p>
+        <% end %>
+
+        <% if rule.dig('dueDate', 'fiscalYearExceptions') %>
+          <p><strong>Fiscal Year Exceptions:</strong> </p>
+          <ul>
+            <% rule.dig('dueDate', 'fiscalYearExceptions').each do |month, exception| %>
+              <li>
+                Month <%= month %>: <%= exception['monthsAfterYearEnd'] %> months after year end, day <%= exception['dayOfMonth'] %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+
+        <div class="rule-actions" style="margin-top: 10px;">
+          <a href="<%= edit_admin_form_calculation_rule_path(params[:id], index) %>" class="button" style="padding: 8px 16px; display: inline-block;">Edit Rule</a>
+          <%= button_to "Delete Rule", admin_form_calculation_rule_path(params[:id], index), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "button", style: "background-color: #d9534f; padding: 8px 16px; display: inline-block; margin-left: 10px;" %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <p>No calculation rules defined for this form.</p>
+  <% end %>
+
+  <div class="actions">
+    <a href="<%= new_admin_form_calculation_rule_path(params[:id]) %>" class="button" style="padding: 10px 20px;">Add Calculation Rule</a>
+  </div>
+</div>
+
+<script>
+    function toggleParentForm(checkbox) {
+        const parentFormField = document.getElementById('parent_form_field');
+        if (checkbox.checked) {
+            parentFormField.style.display = 'none';
+        } else {
+            parentFormField.style.display = 'block';
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const isParentCheckbox = document.querySelector('input[name="is_parent"]');
+        if (isParentCheckbox) {
+            toggleParentForm(isParentCheckbox);
+        }
+    });
+</script>

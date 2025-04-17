@@ -1,97 +1,14 @@
-
 {
   "forms": [
-    {
-      "formNumber": "1040",
-      "formName": "U.S. Individual Income Tax Return",
-      "localityType": "federal",
-      "locality": "United States",
-      "entityType": "individual",
-      "parentFormNumbers": ["1040"],
-      "owner": "MPM",
-      "extension": {
-        "formNumber": "4868",
-        "formName": "Application for Automatic Extension of Time to File U.S. Individual Income Tax Return",
-        "piggybackFed": false
-      },
-      "calculationBase": "end",
-      "calculationRules": [
-        {
-          "effectiveYears": [2023, 2024],
-          "dueDate": {
-            "monthsAfterYearEnd": 4,
-            "dayOfMonth": 15
-          },
-          "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
-            "dayOfMonth": 15
-          }
-        }
-      ]
-    },
-    {
-      "formNumber": "1065",
-      "formName": "U.S. Return of Partnership Income",
-      "localityType": "federal",
-      "locality": "United States",
-      "entityType": "partnership",
-      "parentFormNumbers": ["1065"],
-      "owner": "MPM",
-      "extension": {
-        "formNumber": "7004",
-        "formName": "Application for Automatic Extension of Time to File Certain Business Income Tax Returns",
-        "piggybackFed": false
-      },
-      "calculationBase": "end",
-      "calculationRules": [
-        {
-          "effectiveYears": [2023, 2024],
-          "dueDate": {
-            "monthsAfterYearEnd": 3,
-            "dayOfMonth": 15
-          },
-          "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
-            "dayOfMonth": 15
-          }
-        }
-      ]
-    },
-    {
-      "formNumber": "1120S",
-      "formName": "U.S. Income Tax Return for an S Corporation",
-      "localityType": "federal",
-      "locality": "United States",
-      "entityType": "scorp",
-      "parentFormNumbers": ["1120S"],
-      "owner": "MPM",
-      "extension": {
-        "formNumber": "7004",
-        "formName": "Application for Automatic Extension of Time to File Certain Business Income Tax Returns",
-        "piggybackFed": false
-      },
-      "calculationBase": "end",
-      "calculationRules": [
-        {
-          "effectiveYears": [2023, 2024],
-          "dueDate": {
-            "monthsAfterYearEnd": 3,
-            "dayOfMonth": 15
-          },
-          "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
-            "dayOfMonth": 15
-          }
-        }
-      ]
-    },
     {
       "formNumber": "1120",
       "formName": "U.S. Corporation Income Tax Return",
       "localityType": "federal",
       "locality": "United States",
       "entityType": "corporation",
-      "parentFormNumbers": ["1120"],
+      "parentFormNumbers": [
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "7004",
@@ -99,31 +16,7 @@
         "piggybackFed": false
       },
       "calculationBase": "end",
-      "calculationRules": [
-        {
-          "effectiveYears": [2023, 2024],
-          "dueDate": {
-            "monthsAfterYearEnd": 3,
-            "dayOfMonth": 15,
-            "fiscalYearExceptions": {
-              "06": {
-                "monthsAfterYearEnd": 4,
-                "dayOfMonth": 15
-              }
-            }
-          },
-          "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
-            "dayOfMonth": 15,
-            "fiscalYearExceptions": {
-              "06": {
-                "monthsAfterYearEnd": 10,
-                "dayOfMonth": 15
-              }
-            }
-          }
-        }
-      ]
+      "calculationRules": []
     },
     {
       "formNumber": "AL40",
@@ -131,7 +24,9 @@
       "localityType": "state",
       "locality": "Alabama",
       "entityType": "individual",
-      "parentFormNumbers": ["1040"],
+      "parentFormNumbers": [
+        "1040"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "4868A",
@@ -141,7 +36,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 4,
             "dayOfMonth": 15
@@ -159,7 +57,9 @@
       "localityType": "state",
       "locality": "Alabama",
       "entityType": "partnership",
-      "parentFormNumbers": ["1065"],
+      "parentFormNumbers": [
+        "1065"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "7004A",
@@ -169,7 +69,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -187,7 +90,9 @@
       "localityType": "state",
       "locality": "Alabama",
       "entityType": "scorp",
-      "parentFormNumbers": ["1120S"],
+      "parentFormNumbers": [
+        "1120S"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "7004A",
@@ -197,7 +102,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -215,7 +123,9 @@
       "localityType": "state",
       "locality": "Alabama",
       "entityType": "corporation",
-      "parentFormNumbers": ["1120"],
+      "parentFormNumbers": [
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "7004A",
@@ -225,7 +135,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15,
@@ -255,7 +168,10 @@
       "localityType": "state",
       "locality": "Alabama",
       "entityType": "smllc",
-      "parentFormNumbers": ["1040", "1120"],
+      "parentFormNumbers": [
+        "1040",
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "BPT-E",
@@ -265,7 +181,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -283,7 +202,9 @@
       "localityType": "state",
       "locality": "Georgia",
       "entityType": "individual",
-      "parentFormNumbers": ["1040"],
+      "parentFormNumbers": [
+        "1040"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "IT-303",
@@ -293,7 +214,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 4,
             "dayOfMonth": 15
@@ -311,7 +235,9 @@
       "localityType": "state",
       "locality": "Georgia",
       "entityType": "partnership",
-      "parentFormNumbers": ["1065"],
+      "parentFormNumbers": [
+        "1065"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "IT-303",
@@ -321,7 +247,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -339,7 +268,9 @@
       "localityType": "state",
       "locality": "Georgia",
       "entityType": "scorp",
-      "parentFormNumbers": ["1120S"],
+      "parentFormNumbers": [
+        "1120S"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "IT-303",
@@ -349,7 +280,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -367,7 +301,9 @@
       "localityType": "state",
       "locality": "Georgia",
       "entityType": "corporation",
-      "parentFormNumbers": ["1120"],
+      "parentFormNumbers": [
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "IT-303",
@@ -377,7 +313,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15,
@@ -407,7 +346,10 @@
       "localityType": "state",
       "locality": "Georgia",
       "entityType": "smllc",
-      "parentFormNumbers": ["1040", "1120"],
+      "parentFormNumbers": [
+        "1040",
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "CL-1E",
@@ -417,7 +359,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearStart": 4,
             "dayOfMonth": 1
@@ -431,7 +376,9 @@
       "localityType": "state",
       "locality": "Texas",
       "entityType": "corporation",
-      "parentFormNumbers": ["1120"],
+      "parentFormNumbers": [
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "05-164",
@@ -441,7 +388,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearStart": 5,
             "dayOfMonth": 15
@@ -459,7 +409,9 @@
       "localityType": "state",
       "locality": "Texas",
       "entityType": "scorp",
-      "parentFormNumbers": ["1120S"],
+      "parentFormNumbers": [
+        "1120S"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "05-164",
@@ -469,7 +421,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearStart": 5,
             "dayOfMonth": 15
@@ -487,7 +442,10 @@
       "localityType": "state",
       "locality": "Texas",
       "entityType": "smllc",
-      "parentFormNumbers": ["1040", "1120"],
+      "parentFormNumbers": [
+        "1040",
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "05-164",
@@ -497,7 +455,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearStart": 5,
             "dayOfMonth": 15
@@ -515,7 +476,9 @@
       "localityType": "state",
       "locality": "Tennessee",
       "entityType": "corporation",
-      "parentFormNumbers": ["1120"],
+      "parentFormNumbers": [
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "FAE173",
@@ -525,7 +488,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 4,
             "dayOfMonth": 15
@@ -543,7 +509,9 @@
       "localityType": "state",
       "locality": "Tennessee",
       "entityType": "scorp",
-      "parentFormNumbers": ["1120S"],
+      "parentFormNumbers": [
+        "1120S"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "FAE173",
@@ -553,7 +521,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 4,
             "dayOfMonth": 15
@@ -571,7 +542,10 @@
       "localityType": "state",
       "locality": "Tennessee",
       "entityType": "smllc",
-      "parentFormNumbers": ["1040", "1120"],
+      "parentFormNumbers": [
+        "1040",
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "FAE173",
@@ -581,7 +555,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 4,
             "dayOfMonth": 15
@@ -599,7 +576,9 @@
       "localityType": "state",
       "locality": "Massachusetts",
       "entityType": "individual",
-      "parentFormNumbers": ["1040"],
+      "parentFormNumbers": [
+        "1040"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "M-4868",
@@ -609,7 +588,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 4,
             "dayOfMonth": 15
@@ -627,7 +609,9 @@
       "localityType": "state",
       "locality": "Massachusetts",
       "entityType": "partnership",
-      "parentFormNumbers": ["1065"],
+      "parentFormNumbers": [
+        "1065"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "M-8736",
@@ -637,7 +621,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -655,7 +642,9 @@
       "localityType": "state",
       "locality": "Massachusetts",
       "entityType": "scorp",
-      "parentFormNumbers": ["1120S"],
+      "parentFormNumbers": [
+        "1120S"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "M-8736",
@@ -665,7 +654,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -683,7 +675,9 @@
       "localityType": "state",
       "locality": "Massachusetts",
       "entityType": "corporation",
-      "parentFormNumbers": ["1120"],
+      "parentFormNumbers": [
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "M-8736",
@@ -693,7 +687,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15,
@@ -723,7 +720,9 @@
       "localityType": "state",
       "locality": "California",
       "entityType": "individual",
-      "parentFormNumbers": ["1040"],
+      "parentFormNumbers": [
+        "1040"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "FTB 3519",
@@ -733,7 +732,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 4,
             "dayOfMonth": 15
@@ -751,7 +753,9 @@
       "localityType": "state",
       "locality": "California",
       "entityType": "partnership",
-      "parentFormNumbers": ["1065"],
+      "parentFormNumbers": [
+        "1065"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "FTB 3538",
@@ -761,7 +765,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -779,7 +786,9 @@
       "localityType": "state",
       "locality": "California",
       "entityType": "scorp",
-      "parentFormNumbers": ["1120S"],
+      "parentFormNumbers": [
+        "1120S"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "FTB 3539",
@@ -789,7 +798,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -807,7 +819,9 @@
       "localityType": "state",
       "locality": "California",
       "entityType": "corporation",
-      "parentFormNumbers": ["1120"],
+      "parentFormNumbers": [
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "FTB 3539",
@@ -817,7 +831,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15,
@@ -847,7 +864,10 @@
       "localityType": "state",
       "locality": "California",
       "entityType": "smllc",
-      "parentFormNumbers": ["1040", "1120"],
+      "parentFormNumbers": [
+        "1040",
+        "1120"
+      ],
       "owner": "MPM",
       "extension": {
         "formNumber": "FTB 3538",
@@ -857,7 +877,10 @@
       "calculationBase": "end",
       "calculationRules": [
         {
-          "effectiveYears": [2023, 2024],
+          "effectiveYears": [
+            2023,
+            2024
+          ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
             "dayOfMonth": 15
@@ -868,6 +891,24 @@
           }
         }
       ]
+    },
+    {
+      "formNumber": "1041",
+      "formName": "Fiduciary Tax Return",
+      "localityType": "federal",
+      "locality": "United States",
+      "entityType": "individual",
+      "parentFormNumbers": [
+        "1041"
+      ],
+      "owner": "MPM",
+      "calculationBase": "end",
+      "calculationRules": [],
+      "extension": {
+        "formNumber": "4868",
+        "formName": "Application for Automatic Extension of Time to File U.S. FiduciARY Income Tax Return",
+        "piggybackFed": false
+      }
     }
   ]
 }
