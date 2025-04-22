@@ -1,156 +1,521 @@
-<h1>Edit Tax Form: <%= @form['formNumber'] %></h1>
-
-<div class="actions" style="margin-bottom: 20px;">
-  <a href="<%= new_admin_form_calculation_rule_path(params[:id]) %>" class="button" style="padding: 10px 20px;">Add Calculation Rule</a>
+<!-- app/views/admin/forms/edit.html.erb -->
+<div class="form-header">
+  <h1>Edit Tax Form: <%= @form['formNumber'] %></h1>
+  <div class="form-actions">
+    <a href="<%= new_admin_form_calculation_rule_path(params[:id]) %>" class="btn btn-success">Add Calculation Rule</a>
+  </div>
 </div>
 
-<%= form_with(url: admin_form_path(params[:id]), method: :patch) do |form| %>
-  <div class="form-section">
-    <h3>Basic Information</h3>
+<form id="formEditor" action="<%= admin_form_path(params[:id]) %>" method="post">
+  <input type="hidden" name="_method" value="patch">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
 
-    <div class="field-group">
-      <div class="field">
-        <%= form.label :form_number, "Form Number:" %>
-        <%= form.text_field :form_number, value: @form['formNumber'], required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
-      </div>
-
-      <div class="field">
-        <%= form.label :form_name, "Form Name:" %>
-        <%= form.text_field :form_name, value: @form['formName'], required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
-      </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>Basic Information</h2>
     </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="form_number">Form Number</label>
+          <input type="text" id="form_number" name="form_number" value="<%= @form['formNumber'] %>" required class="form-control">
+        </div>
 
-    <div class="field-group">
-      <div class="field">
-        <%= form.label :entity_type, "Entity Type:" %>
-        <%= form.select :entity_type, @available_entity_types, { selected: @form['entityType'] }, { required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" } %>
-      </div>
-
-      <div class="field">
-        <%= form.label :locality_type, "Locality Type:" %>
-        <%= form.select :locality_type, @available_locality_types, { selected: @form['localityType'] }, { required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" } %>
-      </div>
-
-      <div class="field">
-        <%= form.label :locality, "Locality:" %>
-        <%= form.text_field :locality, value: @form['locality'], required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
-      </div>
-    </div>
-
-    <div class="field-group">
-      <div class="field">
-        <% is_parent = @form['parentFormNumbers'] && @form['parentFormNumbers'].include?(@form['formNumber']) %>
-        <%= form.label :is_parent, "Is Parent Form?" %>
-        <%= form.check_box :is_parent, checked: is_parent, onchange: "toggleParentForm(this)" %>
-      </div>
-
-      <div class="field" id="parent_form_field">
-        <%= form.label :parent_form_number, "Parent Form:" %>
-        <%= form.select :parent_form_number,
-                        @parent_forms.map { |f| [f['formNumber'], f['formNumber']] },
-                        { selected: (@form['parentFormNumbers']&.first || ""), include_blank: "Select Parent Form" },
-                        { style: "width: 100%; padding: 8px; box-sizing: border-box;" } %>
-      </div>
-    </div>
-
-    <div class="field-group">
-      <div class="field">
-        <%= form.label :owner, "Owner:" %>
-        <%= form.text_field :owner, value: @form['owner'] || "MPM", style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
-      </div>
-
-      <div class="field">
-        <%= form.label :calculation_base, "Calculation Base:" %>
-        <%= form.select :calculation_base, [["End", "end"], ["Start", "start"]], { selected: @form['calculationBase'] || "end" }, { style: "width: 100%; padding: 8px; box-sizing: border-box;" } %>
-      </div>
-    </div>
-  </div>
-
-  <div class="form-section">
-    <h3>Extension Information</h3>
-
-    <div class="field-group">
-      <div class="field">
-        <%= form.label :extension_form_number, "Extension Form Number:" %>
-        <%= form.text_field :extension_form_number, value: @form.dig('extension', 'formNumber'), style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
-      </div>
-
-      <div class="field">
-        <%= form.label :extension_form_name, "Extension Form Name:" %>
-        <%= form.text_field :extension_form_name, value: @form.dig('extension', 'formName'), style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
-      </div>
-
-      <div class="field">
-        <%= form.label :piggyback_fed, "Piggyback Fed?" %>
-        <%= form.check_box :piggyback_fed, checked: @form.dig('extension', 'piggybackFed') %>
-      </div>
-    </div>
-  </div>
-
-  <div class="actions" style="margin: 20px 0;">
-    <%= form.submit "Update Form", class: "button", style: "padding: 10px 20px;" %>
-    <a href="<%= admin_forms_path %>" class="button" style="padding: 10px 20px;">Back to List</a>
-    <%= button_to "Delete Form", admin_form_path(params[:id]), method: :delete, data: { turbo_confirm: "Are you sure you want to delete this form?" }, class: "button", style: "background-color: #d9534f; padding: 10px 20px;" %>
-  </div>
-<% end %>
-
-<div class="form-section">
-  <h3>Calculation Rules</h3>
-
-  <% if @form['calculationRules'] && @form['calculationRules'].any? %>
-    <% @form['calculationRules'].each_with_index do |rule, index| %>
-      <div class="calculation-rule" style="background-color: #f7f7f7; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
-        <h4>Rule #<%= index + 1 %></h4>
-
-        <p><strong>Effective Years:</strong> <%= rule['effectiveYears'].join(', ') %></p>
-
-        <p><strong>Due Date:</strong> <%= rule.dig('dueDate', 'monthsAfterYearEnd') %> months after year end, day <%= rule.dig('dueDate', 'dayOfMonth') %></p>
-
-        <% if rule.dig('extensionDueDate') %>
-          <p><strong>Extension Due Date:</strong> <%= rule.dig('extensionDueDate', 'monthsAfterYearEnd') %> months after year end, day <%= rule.dig('extensionDueDate', 'dayOfMonth') %></p>
-        <% end %>
-
-        <% if rule.dig('dueDate', 'fiscalYearExceptions') %>
-          <p><strong>Fiscal Year Exceptions:</strong> </p>
-          <ul>
-            <% rule.dig('dueDate', 'fiscalYearExceptions').each do |month, exception| %>
-              <li>
-                Month <%= month %>: <%= exception['monthsAfterYearEnd'] %> months after year end, day <%= exception['dayOfMonth'] %>
-              </li>
-            <% end %>
-          </ul>
-        <% end %>
-
-        <div class="rule-actions" style="margin-top: 10px;">
-          <a href="<%= edit_admin_form_calculation_rule_path(params[:id], index) %>" class="button" style="padding: 8px 16px; display: inline-block;">Edit Rule</a>
-          <%= button_to "Delete Rule", admin_form_calculation_rule_path(params[:id], index), method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "button", style: "background-color: #d9534f; padding: 8px 16px; display: inline-block; margin-left: 10px;" %>
+        <div class="form-group">
+          <label for="form_name">Form Name</label>
+          <input type="text" id="form_name" name="form_name" value="<%= @form['formName'] %>" required class="form-control">
         </div>
       </div>
-    <% end %>
-  <% else %>
-    <p>No calculation rules defined for this form.</p>
-  <% end %>
 
-  <div class="actions">
-    <a href="<%= new_admin_form_calculation_rule_path(params[:id]) %>" class="button" style="padding: 10px 20px;">Add Calculation Rule</a>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="entity_type">Entity Type</label>
+          <select id="entity_type" name="entity_type" required class="form-control">
+            <% @available_entity_types.each do |entity_type| %>
+              <option value="<%= entity_type %>" <%= 'selected' if @form['entityType'] == entity_type %>><%= entity_type.capitalize %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="locality_type">Locality Type</label>
+          <select id="locality_type" name="locality_type" required class="form-control">
+            <% @available_locality_types.each do |locality_type| %>
+              <option value="<%= locality_type %>" <%= 'selected' if @form['localityType'] == locality_type %>><%= locality_type.capitalize %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="locality">Locality</label>
+          <input type="text" id="locality" name="locality" value="<%= @form['locality'] %>" required class="form-control">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group checkbox-group">
+          <label class="checkbox-container">
+            <% is_parent = @form['parentFormNumbers'] && @form['parentFormNumbers'].include?(@form['formNumber']) %>
+            <input type="checkbox" id="is_parent" name="is_parent" <%= 'checked' if is_parent %>>
+            <span class="checkbox-label">Is Parent Form?</span>
+          </label>
+        </div>
+
+        <div class="form-group" id="parent_form_field" style="<%= is_parent ? 'display: none;' : '' %>">
+          <label for="parent_form_number">Parent Form</label>
+          <select id="parent_form_number" name="parent_form_number" class="form-control">
+            <option value="">Select Parent Form</option>
+            <% @parent_forms.each do |f| %>
+              <option value="<%= f['formNumber'] %>" <%= 'selected' if @form['parentFormNumbers']&.first == f['formNumber'] %>><%= f['formNumber'] %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="owner">Owner</label>
+          <input type="text" id="owner" name="owner" value="<%= @form['owner'] || 'MPM' %>" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="calculation_base">Calculation Base</label>
+          <select id="calculation_base" name="calculation_base" class="form-control">
+            <option value="end" <%= 'selected' if @form['calculationBase'] == 'end' || !@form['calculationBase'] %>>End</option>
+            <option value="start" <%= 'selected' if @form['calculationBase'] == 'start' %>>Start</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Extension Information</h2>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="extension_form_number">Extension Form Number</label>
+          <input type="text" id="extension_form_number" name="extension_form_number" value="<%= @form.dig('extension', 'formNumber') %>" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="extension_form_name">Extension Form Name</label>
+          <input type="text" id="extension_form_name" name="extension_form_name" value="<%= @form.dig('extension', 'formName') %>" class="form-control">
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-container">
+            <input type="checkbox" id="piggyback_fed" name="piggyback_fed" <%= 'checked' if @form.dig('extension', 'piggybackFed') %>>
+            <span class="checkbox-label">Piggyback Fed?</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-submit-actions">
+    <button type="submit" class="btn btn-primary">Update Form</button>
+    <a href="<%= admin_forms_path %>" class="btn btn-secondary">Back to List</a>
+    <button type="button" id="deleteFormBtn" class="btn btn-danger">Delete Form</button>
+  </div>
+</form>
+
+<div class="card calculation-rules-card">
+  <div class="card-header">
+    <h2>Calculation Rules</h2>
+  </div>
+  <div class="card-body">
+    <% if @form['calculationRules'] && @form['calculationRules'].any? %>
+      <div class="rules-container">
+        <% @form['calculationRules'].each_with_index do |rule, index| %>
+          <div class="rule-card">
+            <div class="rule-card-header">
+              <h3>Rule #<%= index + 1 %></h3>
+              <div class="rule-actions">
+                <a href="<%= edit_admin_form_calculation_rule_path(params[:id], index) %>" class="btn btn-sm btn-primary">Edit</a>
+                <%= button_to "Delete", admin_form_calculation_rule_path(params[:id], index), method: :delete, form: { data: { turbo_confirm: "Are you sure?" } }, class: "btn btn-sm btn-danger" %>
+              </div>
+            </div>
+
+            <div class="rule-card-body">
+              <div class="rule-info">
+                <p><strong>Effective Years:</strong> <%= rule['effectiveYears'].join(', ') %></p>
+
+                <p><strong>Due Date:</strong> <%= rule.dig('dueDate', 'monthsAfterYearEnd') %> months after year end, day <%= rule.dig('dueDate', 'dayOfMonth') %></p>
+
+                <% if rule.dig('extensionDueDate') %>
+                  <p><strong>Extension Due Date:</strong> <%= rule.dig('extensionDueDate', 'monthsAfterYearEnd') %> months after year end, day <%= rule.dig('extensionDueDate', 'dayOfMonth') %></p>
+                <% end %>
+
+                <% if rule.dig('dueDate', 'fiscalYearExceptions') %>
+                  <div class="fiscal-exceptions">
+                    <p><strong>Fiscal Year Exceptions:</strong></p>
+                    <ul>
+                      <% rule.dig('dueDate', 'fiscalYearExceptions').each do |month, exception| %>
+                        <li>
+                          Month <%= month %>: <%= exception['monthsAfterYearEnd'] %> months after year end, day <%= exception['dayOfMonth'] %>
+                        </li>
+                      <% end %>
+                    </ul>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="no-rules-message">No calculation rules defined for this form.</p>
+    <% end %>
+
+    <div class="rule-actions-container">
+      <a href="<%= new_admin_form_calculation_rule_path(params[:id]) %>" class="btn btn-success">Add Calculation Rule</a>
+    </div>
   </div>
 </div>
 
-<script>
-    function toggleParentForm(checkbox) {
-        const parentFormField = document.getElementById('parent_form_field');
-        if (checkbox.checked) {
-            parentFormField.style.display = 'none';
-        } else {
-            parentFormField.style.display = 'block';
-        }
+<!-- Delete Form Confirmation Modal -->
+<div id="deleteFormModal" class="modal">
+  <div class="modal-content">
+    <h3>Confirm Delete</h3>
+    <p>Are you sure you want to delete this form? This action cannot be undone.</p>
+    <div class="modal-buttons">
+      <%= button_to "Delete Form", admin_form_path(params[:id]), method: :delete, class: "btn btn-danger" %>
+      <button type="button" id="cancelDeleteForm" class="btn btn-secondary">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<style>
+    /* Modern Form Styling */
+    body {
+        color: #333;
+        line-height: 1.6;
     }
 
-    // Initialize on page load
+    .form-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: #f8f9fa;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #212529;
+    }
+
+    .card-body {
+        padding: 1.75rem;
+    }
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin-bottom: 1.75rem;
+        align-items: flex-start;
+    }
+
+    .form-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-group {
+        flex: 1;
+        min-width: 240px;
+        margin-bottom: 1.25rem;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        height: calc(2.25rem + 2px);
+        padding: 0.6rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        box-sizing: border-box;
+    }
+
+    select.form-control {
+        height: calc(2.25rem + 2px);
+        padding: 0.375rem 0.75rem;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        min-height: calc(2.25rem + 2px);
+        padding-top: 1.65rem;
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 0.5rem;
+    }
+
+    .checkbox-label {
+        margin-left: 0.5rem;
+        font-weight: 400;
+    }
+
+    .btn {
+        display: inline-block;
+        font-weight: 500;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        user-select: none;
+        border: 1px solid transparent;
+        padding: 0.6rem 1rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        cursor: pointer;
+    }
+
+    .btn-sm {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        border-radius: 0.2rem;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+    }
+
+    .btn-secondary {
+        color: #fff;
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+    .btn-success {
+        color: #fff;
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .btn-danger {
+        color: #fff;
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .form-submit-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Calculation Rules Styling */
+    .calculation-rules-card {
+        margin-top: 2rem;
+    }
+
+    .rules-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .rule-card {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+        overflow: hidden;
+    }
+
+    .rule-card-header {
+        background: #e9ecef;
+        padding: 0.75rem 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .rule-card-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .rule-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .rule-card-body {
+        padding: 1.25rem;
+    }
+
+    .rule-info p {
+        margin: 0 0 0.75rem 0;
+        line-height: 1.5;
+    }
+
+    .fiscal-exceptions {
+        margin-top: 0.75rem;
+        padding-left: 1rem;
+        border-left: 3px solid #dee2e6;
+    }
+
+    .fiscal-exceptions ul {
+        margin: 0.75rem 0 0 1.5rem;
+        padding: 0;
+    }
+
+    .fiscal-exceptions li {
+        margin-bottom: 0.5rem;
+    }
+
+    .no-rules-message {
+        font-style: italic;
+        color: #6c757d;
+    }
+
+    .rule-actions-container {
+        margin-top: 1.75rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    /* Modal Styling */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 2rem;
+        border-radius: 5px;
+        width: 400px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .modal-content h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+
+    .modal-content p {
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+</style>
+
+<script>
     document.addEventListener('DOMContentLoaded', function() {
-        const isParentCheckbox = document.querySelector('input[name="is_parent"]');
-        if (isParentCheckbox) {
-            toggleParentForm(isParentCheckbox);
-        }
+        // Toggle parent form field visibility based on checkbox
+        const isParentCheckbox = document.getElementById('is_parent');
+        const parentFormField = document.getElementById('parent_form_field');
+
+        isParentCheckbox.addEventListener('change', function() {
+            parentFormField.style.display = this.checked ? 'none' : 'block';
+        });
+
+        // Delete form modal functionality
+        const deleteFormBtn = document.getElementById('deleteFormBtn');
+        const deleteFormModal = document.getElementById('deleteFormModal');
+        const cancelDeleteForm = document.getElementById('cancelDeleteForm');
+
+        deleteFormBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            deleteFormModal.style.display = 'block';
+        });
+
+        cancelDeleteForm.addEventListener('click', function() {
+            deleteFormModal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside of it
+        window.addEventListener('click', function(e) {
+            if (e.target === deleteFormModal) {
+                deleteFormModal.style.display = 'none';
+            }
+        });
     });
 </script>

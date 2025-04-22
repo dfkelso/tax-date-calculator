@@ -1,6 +1,118 @@
 {
   "forms": [
     {
+      "formNumber": "1040",
+      "formName": "U.S. Individual Income Tax Return",
+      "localityType": "federal",
+      "locality": "United States",
+      "entityType": "individual",
+      "parentFormNumbers": [
+        "1040"
+      ],
+      "owner": "MPM",
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [
+            2023,
+            2024
+          ],
+          "dueDate": {
+            "monthsAfterYearEnd": 4,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        },
+        {
+          "effectiveYears": [
+            2020
+          ],
+          "dueDate": {
+            "monthsAfterYearEnd": 5,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 10,
+            "dayOfMonth": 15
+          }
+        }
+      ],
+      "extension": {
+        "formNumber": "4868",
+        "formName": "Application for Automatic Extension of Time to File U.S. Individual Income Tax Return",
+        "piggybackFed": false
+      }
+    },
+    {
+      "formNumber": "1065",
+      "formName": "U.S. Return of Partnership Income",
+      "localityType": "federal",
+      "locality": "United States",
+      "entityType": "partnership",
+      "parentFormNumbers": [
+        "1065"
+      ],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "7004",
+        "formName": "Application for Automatic Extension of Time to File Certain Business Income Tax Returns",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [
+            2023,
+            2024
+          ],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
+      "formNumber": "1120S",
+      "formName": "U.S. Income Tax Return for an S Corporation",
+      "localityType": "federal",
+      "locality": "United States",
+      "entityType": "scorp",
+      "parentFormNumbers": [
+        "1120S"
+      ],
+      "owner": "MPM",
+      "extension": {
+        "formNumber": "7004",
+        "formName": "Application for Automatic Extension of Time to File Certain Business Income Tax Returns",
+        "piggybackFed": false
+      },
+      "calculationBase": "end",
+      "calculationRules": [
+        {
+          "effectiveYears": [
+            2023,
+            2024
+          ],
+          "dueDate": {
+            "monthsAfterYearEnd": 3,
+            "dayOfMonth": 15
+          },
+          "extensionDueDate": {
+            "monthsAfterYearEnd": 9,
+            "dayOfMonth": 15
+          }
+        }
+      ]
+    },
+    {
       "formNumber": "1120",
       "formName": "U.S. Corporation Income Tax Return",
       "localityType": "federal",
@@ -24,24 +136,23 @@
           ],
           "dueDate": {
             "monthsAfterYearEnd": 3,
-            "dayOfMonth": 15
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 4,
+                "dayOfMonth": 15
+              }
+            }
           },
           "extensionDueDate": {
             "monthsAfterYearEnd": 9,
-            "dayOfMonth": 15
-          }
-        },
-        {
-          "effectiveYears": [
-            2020
-          ],
-          "dueDate": {
-            "monthsAfterYearEnd": 5,
-            "dayOfMonth": 15
-          },
-          "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
-            "dayOfMonth": 15
+            "dayOfMonth": 15,
+            "fiscalYearExceptions": {
+              "06": {
+                "monthsAfterYearEnd": 10,
+                "dayOfMonth": 15
+              }
+            }
           }
         }
       ]

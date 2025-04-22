@@ -4,23 +4,30 @@
 <div class="grid-container">
   <div class="toolbar">
     <div class="toolbar-left">
-      <select id="entityFilter" onchange="applyFilters()">
+      <select id="entityFilter">
         <option value="">All Entity Types</option>
         <% FormsRepository.new.available_entity_types.each do |entity_type| %>
           <option value="<%= entity_type %>"><%= entity_type.capitalize %></option>
         <% end %>
       </select>
 
-      <input type="text" id="searchFilter" placeholder="Search forms..." onkeyup="applyFilters()">
+      <input type="text" id="searchFilter" placeholder="Search forms..." style="min-width: 250px;">
     </div>
 
     <div class="toolbar-right">
       <label>
         Preview Year:
-        <input type="number" id="previewYear" value="<%= @preview_year || 2025 %>" min="2000" max="2050">
+        <input type="number" id="previewYear" value="<%= @preview_year || 2024 %>" min="2000" max="2050">
       </label>
 
-      <button onclick="refreshGrid()" class="refresh-btn">Refresh</button>
+      <button id="refreshBtn" class="refresh-btn">Refresh</button>
+
+      <label class="switch">
+        <input type="checkbox" id="fullWidthToggle" checked>
+        <span class="slider round"></span>
+        <span class="toggle-label">Full Width</span>
+      </label>
+
       <a href="<%= new_admin_form_path %>" class="add-btn">Add New Form</a>
       <a href="<%= admin_export_json_path %>" class="export-btn">Export JSON</a>
     </div>
@@ -29,7 +36,42 @@
   <div id="formsGrid" class="ag-theme-alpine" style="height: 600px; width: 100%;"></div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <h3>Confirm Delete</h3>
+    <p>Are you sure you want to delete this form? This action cannot be undone.</p>
+    <div class="modal-buttons">
+      <button id="confirmDeleteBtn" class="delete-btn">Delete</button>
+      <button id="cancelDeleteBtn" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .admin-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0 10px;
+    }
+
+    .grid-container {
+        width: 98%;
+        margin: 0 auto;
+        transition: width 0.3s ease;
+    }
+
+    .grid-container.full-width {
+        width: 100%;
+        margin: 0;
+        padding: 0 10px;
+    }
+
     .toolbar {
         display: flex;
         justify-content: space-between;
@@ -41,7 +83,7 @@
 
     .toolbar-left, .toolbar-right {
         display: flex;
-        gap: 10px;
+        gap: 15px;
         align-items: center;
     }
 
@@ -72,217 +114,353 @@
         background-color: #6c757d;
     }
 
-    .grid-actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .edit-btn, .delete-btn {
-        cursor: pointer;
-        padding: 4px;
-        border-radius: 4px;
+    /* Toggle Switch Styling */
+    .switch {
+        position: relative;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
+        height: 34px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-label {
+        margin-left: 60px;
+        white-space: nowrap;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        width: 50px;
+        height: 24px;
+        background-color: #ccc;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+    }
+
+    input:checked + .slider {
+        background-color: #17a2b8;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #17a2b8;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .action-btn {
+        display: inline-block;
+        padding: 6px 12px;
+        margin: 0 4px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        white-space: nowrap;
     }
 
     .edit-btn {
-        color: #007bff;
+        background-color: #007bff;
+        color: white;
     }
 
     .delete-btn {
-        color: #dc3545;
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .cancel-btn {
+        background-color: #6c757d;
+        color: white;
     }
 
     .approximated {
         background-color: #fff3cd !important;
     }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 5px;
+        width: 400px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
 </style>
 
 <script>
-    let gridApi;
-    let columnDefs = [
-        { field: 'id', headerName: 'ID', width: 80, sortable: true, filter: true },
-        {
-            field: 'formNumber',
-            headerName: 'Form Number',
-            width: 150,
-            sortable: true,
-            filter: true
-        },
-        {
-            field: 'formName',
-            headerName: 'Form Name',
-            flex: 1,
-            minWidth: 200,
-            sortable: true,
-            filter: true
-        },
-        {
-            field: 'entityType',
-            headerName: 'Entity Type',
-            width: 150,
-            sortable: true,
-            filter: true,
-            cellRenderer: params => params.value ? params.value.charAt(0).toUpperCase() + params.value.slice(1) : ''
-        },
-        {
-            field: 'localityType',
-            headerName: 'Locality Type',
-            width: 150,
-            sortable: true,
-            filter: true
-        },
-        {
-            field: 'locality',
-            headerName: 'Locality',
-            width: 150,
-            sortable: true,
-            filter: true
-        },
-        {
-            field: 'dueDate',
-            headerName: 'Due Date',
-            width: 130,
-            sortable: true,
-            filter: true,
-            cellRenderer: params => {
-                if (!params.value) return 'N/A';
-                const date = new Date(params.value);
-                return date.toLocaleDateString();
-            },
-            cellClassRules: {
-                'approximated': params => params.data.approximated
-            }
-        },
-        {
-            field: 'extensionDueDate',
-            headerName: 'Extension Due Date',
-            width: 180,
-            sortable: true,
-            filter: true,
-            cellRenderer: params => {
-                if (!params.value) return 'N/A';
-                const date = new Date(params.value);
-                return date.toLocaleDateString();
-            },
-            cellClassRules: {
-                'approximated': params => params.data.approximated
-            }
-        },
-        {
-            headerName: 'Actions',
-            width: 120,
-            sortable: false,
-            filter: false,
-            cellRenderer: params => {
-                return `
-          <div class="grid-actions">
-            <a href="/admin/forms/${params.data.id}/edit" class="edit-btn" title="Edit">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-              </svg>
-            </a>
-            <button onclick="confirmDelete(${params.data.id})" class="delete-btn" title="Delete">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-              </svg>
-            </button>
-          </div>
-        `;
-            }
-        }
-    ];
-
-    // Initialize the grid when the page loads
     document.addEventListener('DOMContentLoaded', function() {
+        // State variables
+        let gridApi;
+        let formIdToDelete;
+
+        // Helper function to format dates
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString();
+        }
+
+        // Define column definitions with actions first
+        const columnDefs = [
+            {
+                headerName: 'Actions',
+                width: 200, // Increased width for the actions column
+                pinned: 'left',
+                lockPosition: true,
+                sortable: false,
+                filter: false,
+                cellRenderer: function(params) {
+                    return `
+                    <div class="grid-actions">
+                        <button class="action-btn edit-btn" data-id="${params.data.id}">Edit</button>
+                        <button class="action-btn delete-btn" data-id="${params.data.id}">Delete</button>
+                    </div>
+                `;
+                }
+            },
+            { field: 'id', headerName: 'ID', width: 80, pinned: 'left' },
+            { field: 'formNumber', headerName: 'Form Number', width: 150 },
+            { field: 'formName', headerName: 'Form Name', flex: 1, minWidth: 200 },
+            {
+                field: 'entityType',
+                headerName: 'Entity Type',
+                width: 150,
+                cellRenderer: function(params) {
+                    if (!params.value) return '';
+                    return params.value.charAt(0).toUpperCase() + params.value.slice(1);
+                }
+            },
+            { field: 'localityType', headerName: 'Locality Type', width: 150 },
+            { field: 'locality', headerName: 'Locality', width: 150 },
+            {
+                field: 'dueDate',
+                headerName: 'Due Date',
+                width: 130,
+                cellRenderer: function(params) {
+                    return formatDate(params.value);
+                },
+                cellClassRules: {
+                    'approximated': function(params) {
+                        return params.data && params.data.approximated;
+                    }
+                }
+            },
+            {
+                field: 'extensionDueDate',
+                headerName: 'Extension Due Date',
+                width: 180,
+                cellRenderer: function(params) {
+                    return formatDate(params.value);
+                },
+                cellClassRules: {
+                    'approximated': function(params) {
+                        return params.data && params.data.approximated;
+                    }
+                }
+            }
+        ];
+
+        // Grid options
         const gridOptions = {
             columnDefs: columnDefs,
             defaultColDef: {
-                resizable: true,
                 sortable: true,
-                filter: true
+                filter: true,
+                resizable: true
             },
-            animateRows: true,
-            rowSelection: 'single',
+            rowData: [],
             pagination: true,
             paginationPageSize: 25,
-            onRowClicked: function(event) {
-                // If click was on a button or link, let the default handler work
-                if (event.event.target.closest('.grid-actions')) {
-                    return;
-                }
-
-                // Otherwise navigate to edit page
-                const formId = event.data.id;
-                window.location.href = `/admin/forms/${formId}/edit`;
-            }
+            domLayout: 'normal',
+            animateRows: true,
+            rowSelection: 'single'
         };
 
         // Initialize the grid
-        gridApi = new agGrid.Grid(document.getElementById('formsGrid'), gridOptions);
+        const gridDiv = document.querySelector('#formsGrid');
+        gridApi = new agGrid.Grid(gridDiv, gridOptions).gridApi;
 
-        // Fetch initial data
-        fetchData();
-    });
+        // Function to fetch data
+        function fetchData() {
+            const year = document.querySelector('#previewYear').value || '2024';
+            const url = '<%= admin_forms_path(format: :json) %>?preview_year=' + year;
 
-    function fetchData() {
-        const year = document.getElementById('previewYear').value || <%= @preview_year || 2025 %>;
-        const url = '<%= admin_forms_path(format: :json) %>?preview_year=' + year;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                gridApi.gridOptions.api.setRowData(data);
-            })
-            .catch(error => {
-                console.error('Error fetching forms data:', error);
-            });
-    }
-
-    function applyFilters() {
-        const entityFilter = document.getElementById('entityFilter').value;
-        const searchText = document.getElementById('searchFilter').value.toLowerCase();
-
-        gridApi.gridOptions.api.setQuickFilter(searchText);
-
-        if (entityFilter) {
-            gridApi.gridOptions.api.setFilterModel({
-                entityType: {
-                    type: 'equals',
-                    filter: entityFilter
-                }
-            });
-        } else {
-            gridApi.gridOptions.api.setFilterModel(null);
-            gridApi.gridOptions.api.setQuickFilter(searchText);
+            fetch(url)
+              .then(response => response.json())
+              .then(data => {
+                  gridOptions.api.setRowData(data);
+              })
+              .catch(error => {
+                  console.error('Error fetching data:', error);
+              });
         }
-    }
 
-    function refreshGrid() {
-        fetchData();
-    }
+        // Apply filters
+        function applyFilters() {
+            const entityFilter = document.querySelector('#entityFilter').value;
+            const searchText = document.querySelector('#searchFilter').value;
 
-    function confirmDelete(formId) {
-        if (confirm('Are you sure you want to delete this form?')) {
-            fetch(`/admin/forms/${formId}`, {
+            if (gridOptions.api) {
+                if (searchText) {
+                    gridOptions.api.setQuickFilter(searchText);
+                }
+
+                if (entityFilter) {
+                    const filterInstance = gridOptions.api.getFilterInstance('entityType');
+                    if (filterInstance) {
+                        filterInstance.setModel({
+                            type: 'equals',
+                            filter: entityFilter
+                        });
+                        gridOptions.api.onFilterChanged();
+                    }
+                } else {
+                    gridOptions.api.setFilterModel(null);
+                }
+            }
+        }
+
+        // Toggle full width function - this directly modifies the admin-container class
+        function toggleFullWidth() {
+            const isFullWidth = document.getElementById('fullWidthToggle').checked;
+
+            // Get both the grid container and the admin container
+            const gridContainer = document.querySelector('.grid-container');
+            const adminContainer = document.querySelector('.admin-container');
+
+            if (isFullWidth) {
+                gridContainer.classList.add('full-width');
+                adminContainer.style.maxWidth = "100%";
+                adminContainer.style.padding = "0";
+                adminContainer.style.margin = "0";
+            } else {
+                gridContainer.classList.remove('full-width');
+                adminContainer.style.maxWidth = "";
+                adminContainer.style.padding = "";
+                adminContainer.style.margin = "";
+            }
+
+            // Resize grid to fit new container size
+            if (gridOptions.api) {
+                setTimeout(() => {
+                    gridOptions.api.sizeColumnsToFit();
+                }, 300);
+            }
+        }
+
+        // Delete confirmation modal functions
+        function showDeleteModal(formId) {
+            formIdToDelete = formId;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function hideDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            formIdToDelete = null;
+        }
+
+        function confirmDelete() {
+            if (!formIdToDelete) return;
+
+            fetch(`/admin/forms/${formIdToDelete}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Content-Type': 'application/json'
                 }
             })
-                .then(response => {
-                    if (response.ok) {
-                        fetchData();
-                    } else {
-                        alert('Error deleting form');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+              .then(response => {
+                  hideDeleteModal();
+                  if (response.ok) {
+                      fetchData();
+                  } else {
+                      alert('Error deleting form');
+                  }
+              })
+              .catch(error => {
+                  hideDeleteModal();
+                  console.error('Error:', error);
+              });
         }
-    }
+
+        // Event listeners
+        document.querySelector('#entityFilter').addEventListener('change', applyFilters);
+        document.querySelector('#searchFilter').addEventListener('input', applyFilters);
+        document.querySelector('#refreshBtn').addEventListener('click', fetchData);
+        document.querySelector('#fullWidthToggle').addEventListener('change', toggleFullWidth);
+        document.querySelector('#confirmDeleteBtn').addEventListener('click', confirmDelete);
+        document.querySelector('#cancelDeleteBtn').addEventListener('click', hideDeleteModal);
+
+        // Grid cell button click handlers
+        document.querySelector('#formsGrid').addEventListener('click', function(e) {
+            const btn = e.target.closest('.action-btn');
+            if (!btn) return;
+
+            const formId = btn.getAttribute('data-id');
+
+            if (btn.classList.contains('edit-btn')) {
+                window.location.href = `/admin/forms/${formId}/edit`;
+            } else if (btn.classList.contains('delete-btn')) {
+                showDeleteModal(formId);
+            }
+        });
+
+        // Initial load
+        fetchData();
+
+        // Apply full width by default (toggle is checked by default in the HTML)
+        toggleFullWidth();
+    });
 </script>
