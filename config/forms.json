@@ -1030,6 +1030,19 @@
           }
         }
       ]
+    },
+    {
+      "formNumber": "990",
+      "formName": "non-profit",
+      "localityType": "federal",
+      "locality": "United States",
+      "entityType": "corporation",
+      "parentFormNumbers": [
+        ""
+      ],
+      "owner": "MPM",
+      "calculationBase": "end",
+      "calculationRules": []
     }
   ]
 }

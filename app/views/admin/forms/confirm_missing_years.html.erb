@@ -1,0 +1,216 @@
+<!-- app/views/admin/forms/confirm_missing_years.html.erb -->
+<h1>Confirm Missing Years Rules</h1>
+
+<div class="form-info">
+  <h2><%= @form_details['formNumber'] %> - <%= @form_details['formName'] %></h2>
+  <p><strong>Entity Type:</strong> <%= @form_details['entityType'] %></p>
+  <p><strong>Locality:</strong> <%= @form_details['localityType'] %> - <%= @form_details['locality'] %></p>
+</div>
+
+<div class="alert alert-info">
+  <p>Please review the suggested rules for the missing years. You can modify them before applying.</p>
+</div>
+
+<%= form_with(url: apply_missing_years_admin_form_path(@form_id), method: :post) do |form| %>
+  <div class="years-container">
+    <% @missing_years.sort.each do |year| %>
+      <div class="year-card">
+        <div class="year-header">
+          <h3>Tax Year <%= year %></h3>
+          <div class="form-check">
+            <%= form.check_box "include_year_#{year}", checked: true, class: "include-year-checkbox", data: { year: year } %>
+            <%= form.label "include_year_#{year}", "Include this year", class: "form-check-label" %>
+          </div>
+        </div>
+
+        <% rule = @suggested_rules[year.to_s] %>
+        <div class="rule-fields" id="rule_fields_<%= year %>">
+          <div class="field">
+            <label>Due Date:</label>
+            <div class="input-group">
+              <input type="number" name="rules[<%= year %>][dueDate][monthsAfterYearEnd]" value="<%= rule['dueDate']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+              <span class="input-group-text">months after year end, day</span>
+              <input type="number" name="rules[<%= year %>][dueDate][dayOfMonth]" value="<%= rule['dueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Extension Due Date:</label>
+            <div class="input-group">
+              <input type="number" name="rules[<%= year %>][extensionDueDate][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+              <span class="input-group-text">months after year end, day</span>
+              <input type="number" name="rules[<%= year %>][extensionDueDate][dayOfMonth]" value="<%= rule['extensionDueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
+            </div>
+          </div>
+
+          <% if rule['dueDate']['fiscalYearExceptions'] && rule['dueDate']['fiscalYearExceptions']['06'] %>
+            <div class="fiscal-exception">
+              <h4>Fiscal Year Exception for June (Month 06):</h4>
+
+              <div class="field">
+                <label>Due Date Exception:</label>
+                <div class="input-group">
+                  <input type="number" name="rules[<%= year %>][dueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['dueDate']['fiscalYearExceptions']['06']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                  <span class="input-group-text">months after year end, day</span>
+                  <input type="number" name="rules[<%= year %>][dueDate][fiscalYearExceptions][06][dayOfMonth]" value="<%= rule['dueDate']['fiscalYearExceptions']['06']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Extension Due Date Exception:</label>
+                <div class="input-group">
+                  <input type="number" name="rules[<%= year %>][extensionDueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['fiscalYearExceptions']['06']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                  <span class="input-group-text">months after year end, day</span>
+                  <input type="number" name="rules[<%= year %>][extensionDueDate][fiscalYearExceptions][06][dayOfMonth]" value="<%= rule['extensionDueDate']['fiscalYearExceptions']['06']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit "Apply These Rules", class: "btn btn-primary" %>
+    <a href="<%= edit_admin_form_path(@form_id) %>" class="btn btn-secondary">Cancel</a>
+  </div>
+<% end %>
+
+<style>
+    .form-info {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+
+    .years-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .year-card {
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .year-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .year-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .rule-fields {
+        padding: 1.5rem;
+    }
+
+    .field {
+        margin-bottom: 1.5rem;
+    }
+
+    .field:last-child {
+        margin-bottom: 0;
+    }
+
+    .input-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .input-group-text {
+        padding: 0.5rem;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+
+    .form-control {
+        padding: 0.5rem;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        width: 100px;
+    }
+
+    .fiscal-exception {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border-left: 3px solid #6c757d;
+        background-color: #f8f9fa;
+    }
+
+    .fiscal-exception h4 {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-check-input {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        text-decoration: none;
+        cursor: pointer;
+        font-weight: 500;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle checkbox changes to show/hide rule fields
+        const yearCheckboxes = document.querySelectorAll('.include-year-checkbox');
+
+        yearCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const year = this.dataset.year;
+                const ruleFields = document.getElementById(`rule_fields_${year}`);
+
+                if (this.checked) {
+                    ruleFields.style.display = 'block';
+                } else {
+                    ruleFields.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>

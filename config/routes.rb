@@ -12,11 +12,17 @@ Rails.application.routes.draw do
 
   # Admin interface routes
   namespace :admin do
-    root to: 'forms#index'  # Changed from 'base#index' to 'forms#index'
+    root to: 'forms#index'
 
     resources :forms do
       member do
         get 'preview_dates'
+        post 'fill_missing_years'
+        get 'confirm_missing_years'
+        post 'apply_missing_years'
+        post 'generate_ai_rules'
+        get 'confirm_ai_rules'
+        post 'apply_ai_rules'
       end
 
       resources :calculation_rules
@@ -24,5 +30,6 @@ Rails.application.routes.draw do
 
     # JSON export only
     get 'export_json', to: 'forms#export_json'
+    post 'import_json', to: 'base#import_json'
   end
 end
