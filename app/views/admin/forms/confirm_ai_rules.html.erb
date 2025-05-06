@@ -1,4 +1,5 @@
 <!-- app/views/admin/forms/confirm_ai_rules.html.erb -->
+
 <h1>Confirm AI-Generated Tax Rules</h1>
 
 <div class="form-info">
@@ -9,6 +10,7 @@
 
 <div class="alert alert-info">
   <p>Our AI has analyzed historical tax filing patterns and suggested the following rules. Please review them before applying.</p>
+  <p><strong>Note:</strong> For each rule, we show example dates based on the current tax year.</p>
 </div>
 
 <%= form_with(url: apply_ai_rules_admin_form_path(@form_id), method: :post) do |form| %>
@@ -20,30 +22,32 @@
       <%= form.label :replace_existing, "Replace existing rules (otherwise rules will be added)", class: "form-check-label" %>
     </div>
 
-    <%= form.submit "Apply All Rules", class: "btn btn-primary" %>
+    <!-- Select/deselect all button -->
+    <button type="button" class="btn btn-secondary" id="toggle_all">Select/Deselect All</button>
+
+    <%= form.submit "Apply Selected Rules", class: "btn btn-primary" %>
     <a href="<%= edit_admin_form_path(@form_id) %>" class="btn btn-secondary">Cancel</a>
   </div>
 
   <div class="years-container">
     <% @years.sort.each do |year| %>
+      <% # Find a rule that includes this year
+         rule = nil
+         if @suggested_rules && @suggested_rules["calculationRules"]
+           rule = @suggested_rules["calculationRules"].find { |r| r["effectiveYears"] && r["effectiveYears"].include?(year) }
+         end
+      %>
       <div class="year-card">
         <div class="year-header">
           <h3>Tax Year <%= year %></h3>
           <div class="form-check">
-            <%= form.check_box "include_year_#{year}", checked: true, class: "include-year-checkbox", data: { year: year } %>
+            <%= form.check_box "include_year_#{year}", checked: rule.present?, class: "include-year-checkbox", data: { year: year } %>
             <%= form.label "include_year_#{year}", "Include this year", class: "form-check-label" %>
           </div>
         </div>
 
-        <% # Find a rule that includes this year
-           rule = nil
-           if @suggested_rules && @suggested_rules["calculationRules"]
-             rule = @suggested_rules["calculationRules"].find { |r| r["effectiveYears"] && r["effectiveYears"].include?(year) }
-           end
-        %>
-
         <% if rule %>
-          <div class="rule-fields" id="rule_fields_<%= year %>">
+          <div class="rule-fields" id="rule_fields_<%= year %>" style="<%= rule.present? ? '' : 'display: none;' %>">
             <div class="field">
               <label>Due Date:</label>
               <div class="input-group">
@@ -51,6 +55,11 @@
                 <span class="input-group-text">months after year end, day</span>
                 <input type="number" name="rules[<%= year %>][dueDate][dayOfMonth]" value="<%= rule['dueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
               </div>
+              <% if rule['exampleDates'] %>
+                <div class="example-date">
+                  Example: For tax year <%= rule['exampleDates']['year'] %>, due date would be <strong><%= rule['exampleDates']['dueDate'] %></strong>
+                </div>
+              <% end %>
             </div>
 
             <div class="field">
@@ -60,6 +69,11 @@
                 <span class="input-group-text">months after year end, day</span>
                 <input type="number" name="rules[<%= year %>][extensionDueDate][dayOfMonth]" value="<%= rule['extensionDueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
               </div>
+              <% if rule['exampleDates'] %>
+                <div class="example-date">
+                  Example: For tax year <%= rule['exampleDates']['year'] %>, extension due date would be <strong><%= rule['exampleDates']['extensionDueDate'] %></strong>
+                </div>
+              <% end %>
             </div>
 
             <% if rule['dueDate']['fiscalYearExceptions'] && rule['dueDate']['fiscalYearExceptions']['06'] %>
@@ -87,7 +101,7 @@
             <% end %>
           </div>
         <% else %>
-          <div class="rule-fields" id="rule_fields_<%= year %>">
+          <div class="rule-fields" id="rule_fields_<%= year %>" style="display: none;">
             <p class="no-rule">No rule generated for this year.</p>
           </div>
         <% end %>
@@ -95,7 +109,7 @@
     <% end %>
   </div>
   <div class="form-actions bottom-actions">
-    <%= form.submit "Apply All Rules", class: "btn btn-primary" %>
+    <%= form.submit "Apply Selected Rules", class: "btn btn-primary" %>
     <a href="<%= edit_admin_form_path(@form_id) %>" class="btn btn-secondary">Cancel</a>
   </div>
 <% end %>
@@ -241,6 +255,13 @@
         padding: 0.75rem;
         background-color: #f8d7da;
         border-radius: 0.25rem;
+    }
+
+    .example-date {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+        font-style: italic;
     }
 </style>
 

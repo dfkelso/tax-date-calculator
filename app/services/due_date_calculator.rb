@@ -1,6 +1,8 @@
+# app/services/due_date_calculator.rb
+
 class DueDateCalculator
-  def initialize(forms_repository = FormsRepository.new)
-    @forms_repository = forms_repository
+  def initialize(forms_repository = nil)
+    @forms_repository = forms_repository || FormsRepository.new
   end
 
   def calculate_dates(form_number, entity_type, locality_type, locality, coverage_start_date, coverage_end_date)
@@ -15,10 +17,16 @@ class DueDateCalculator
     tax_year = coverage_end_date.year
     rule = find_applicable_rule(form, tax_year)
 
-    if !rule
-      puts "No applicable rule found for year #{tax_year}"
-      return nil
-    end
+    return nil unless rule
+
+    # Calculate dates using the rule
+    calculate_specific_dates(rule, coverage_start_date, coverage_end_date, base_date)
+  end
+
+  # New method to calculate dates from a rule directly (used by AI suggestions preview)
+  def calculate_specific_dates(rule, start_date, end_date, base_date = nil)
+    # Default to end date as base if not specified
+    base_date ||= end_date
 
     # Get month of base date for fiscal year exception checking
     base_month = base_date.month.to_s.rjust(2, '0')
@@ -26,13 +34,13 @@ class DueDateCalculator
     # Calculate due date
     due_date = nil
     if rule['dueDate']
-      due_date = calculate_specific_date(rule['dueDate'], base_date, base_month)
+      due_date = calculate_date(rule['dueDate'], base_date, base_month, end_date.year)
     end
 
     # Calculate extension date
     extension_due_date = nil
     if rule['extensionDueDate']
-      extension_due_date = calculate_specific_date(rule['extensionDueDate'], base_date, base_month)
+      extension_due_date = calculate_date(rule['extensionDueDate'], base_date, base_month, end_date.year)
     end
 
     {
@@ -46,15 +54,37 @@ class DueDateCalculator
   def find_applicable_rule(form, tax_year)
     return nil unless form['calculationRules']
 
-    form['calculationRules'].find do |rule|
+    # Try to find exact year match first
+    exact_match = form['calculationRules'].find do |rule|
       rule['effectiveYears'] && rule['effectiveYears'].include?(tax_year)
     end
+
+    return exact_match if exact_match
+
+    # If no exact match, find closest year
+    closest_rule = nil
+    closest_year_diff = Float::INFINITY
+
+    form['calculationRules'].each do |rule|
+      next unless rule['effectiveYears']&.any?
+
+      rule['effectiveYears'].each do |year|
+        year_diff = (year - tax_year).abs
+        if year_diff < closest_year_diff
+          closest_year_diff = year_diff
+          closest_rule = rule.merge('approximated' => true)
+        end
+      end
+    end
+
+    closest_rule
   end
 
-  def calculate_specific_date(date_rule, base_date, base_month)
-    # Default variables
+  def calculate_date(date_rule, base_date, base_month, year)
+    # Default values
     months_to_add = 0
-    day_of_month = 15 # Default
+    day_of_month = date_rule['dayOfMonth'] || 15
+    reference_date = base_date
 
     # Check for fiscal year exceptions first
     if date_rule['fiscalYearExceptions'] && date_rule['fiscalYearExceptions'][base_month]
@@ -62,28 +92,27 @@ class DueDateCalculator
 
       if exception['monthsAfterYearEnd']
         months_to_add = exception['monthsAfterYearEnd']
-        reference_date = base_date
       elsif exception['monthsAfterYearStart']
         months_to_add = exception['monthsAfterYearStart']
-        reference_date = Date.new(base_date.year, 1, 1)
+        reference_date = Date.new(year, 1, 1)
       end
 
       day_of_month = exception['dayOfMonth'] if exception['dayOfMonth']
-
-      # Otherwise use standard rules
     else
+      # Use standard rules
       if date_rule['monthsAfterYearEnd']
         months_to_add = date_rule['monthsAfterYearEnd']
-        reference_date = base_date
       elsif date_rule['monthsAfterYearStart']
         months_to_add = date_rule['monthsAfterYearStart']
-        reference_date = Date.new(base_date.year, 1, 1)
+        reference_date = Date.new(year, 1, 1)
       end
-
-      day_of_month = date_rule['dayOfMonth'] if date_rule['dayOfMonth']
     end
 
     # Calculate the result date using safe Date arithmetic
+    calculate_result_date(reference_date, months_to_add, day_of_month)
+  end
+
+  def calculate_result_date(reference_date, months_to_add, day_of_month)
     year = reference_date.year + ((reference_date.month + months_to_add - 1) / 12)
     month = ((reference_date.month + months_to_add - 1) % 12) + 1
 
