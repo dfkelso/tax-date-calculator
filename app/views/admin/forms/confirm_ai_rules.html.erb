@@ -283,4 +283,19 @@
             });
         });
     });
+
+    // Toggle all checkboxes
+    document.getElementById('toggle_all').addEventListener('click', function() {
+        const checkboxes = document.querySelectorAll('.include-year-checkbox');
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !allChecked;
+
+            // Trigger change event to update visibility
+            const event = new Event('change');
+            checkbox.dispatchEvent(event);
+        });
+    });
+
 </script>

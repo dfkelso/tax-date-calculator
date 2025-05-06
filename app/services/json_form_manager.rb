@@ -26,12 +26,20 @@ class JsonFormManager
     form_index = id.to_i - 1
     return false if form_index < 0 || form_index >= all_forms.length
 
-    @data['forms'][form_index] = form_data
+    # Ensure deep cloning of the data
+    @data['forms'][form_index] = deep_clone(form_data)
     save_json
     true
   rescue => e
-    puts "Error updating form: #{e.message}"
+    Rails.logger.error("Error updating form: #{e.message}")
+    Rails.logger.error(e.backtrace.join("\n"))
     false
+  end
+
+  private
+
+  def deep_clone(obj)
+    JSON.parse(obj.to_json)
   end
 
   def delete_form(id)
