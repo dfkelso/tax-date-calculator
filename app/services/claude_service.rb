@@ -2,14 +2,17 @@
 class ClaudeService
   def initialize(api_key = nil)
     @api_key = api_key || ENV['ANTHROPIC_API_KEY']
-    @client = Anthropic::Client.new(api_key: @api_key)
+
+    # Create client with access_token parameter
+    @client = Anthropic::Client.new(access_token: @api_key)
   end
 
-  def generate_calculation_rules(form_data)
-    prompt = build_prompt(form_data)
+  def generate_tax_rules(form_data)
+    prompt = build_tax_rule_prompt(form_data)
 
     begin
-      response = @client.create_message(
+      # Use messages method to create a message
+      response = @client.messages(
         model: "claude-3-opus-20240229",
         max_tokens: 4096,
         messages: [
@@ -21,16 +24,17 @@ class ClaudeService
       parse_response(response.content)
     rescue => e
       Rails.logger.error("Error calling Anthropic API: #{e.message}")
+      Rails.logger.error(e.backtrace.join("\n"))
       nil
     end
   end
 
-  def generate_missing_years(form_data)
-    # Include existing rules in the prompt as reference
-    prompt = build_missing_years_prompt(form_data)
+  def generate_missing_years(form_data, missing_years, existing_rules)
+    prompt = build_missing_years_prompt(form_data, missing_years, existing_rules)
 
     begin
-      response = @client.create_message(
+      # Use messages method to create a message
+      response = @client.messages(
         model: "claude-3-opus-20240229",
         max_tokens: 4096,
         messages: [
@@ -38,17 +42,18 @@ class ClaudeService
         ]
       )
 
+      # Parse the JSON response from Claude
       parse_response(response.content)
     rescue => e
       Rails.logger.error("Error calling Anthropic API for missing years: #{e.message}")
+      Rails.logger.error(e.backtrace.join("\n"))
       nil
     end
   end
 
   private
 
-  def build_prompt(form_data)
-    # Create a structured prompt for Claude
+  def build_tax_rule_prompt(form_data)
     current_year = Date.today.year
     seven_years_ago = current_year - 6
 
@@ -108,10 +113,7 @@ class ClaudeService
     PROMPT
   end
 
-  def build_missing_years_prompt(form_data)
-    missing_years = form_data[:missing_years]
-    existing_rules = form_data[:existing_rules] || []
-
+  def build_missing_years_prompt(form_data, missing_years, existing_rules)
     <<~PROMPT
     You are an expert tax form researcher specializing in due dates for tax forms across multiple jurisdictions. 
     I need you to determine the due dates and extension due dates for the following tax form for specific missing years: #{missing_years.join(', ')}.

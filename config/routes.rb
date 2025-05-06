@@ -12,7 +12,7 @@ Rails.application.routes.draw do
 
   # Admin interface routes
   namespace :admin do
-    root to: 'forms#index'
+    root to: 'base#index'
 
     resources :forms do
       member do
@@ -23,6 +23,7 @@ Rails.application.routes.draw do
         post 'generate_ai_rules'
         get 'confirm_ai_rules'
         post 'apply_ai_rules'
+        patch 'update_calculation_rules'
       end
 
       resources :calculation_rules

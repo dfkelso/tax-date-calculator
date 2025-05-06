@@ -2,9 +2,9 @@
 <h1>Confirm AI-Generated Tax Rules</h1>
 
 <div class="form-info">
-  <h2><%= @form_details['formNumber'] %> - <%= @form_details['formName'] %></h2>
-  <p><strong>Entity Type:</strong> <%= @form_details['entityType'] %></p>
-  <p><strong>Locality:</strong> <%= @form_details['localityType'] %> - <%= @form_details['locality'] %></p>
+  <h2><%= @form_details[:form_number] %> - <%= @form_details[:form_name] %></h2>
+  <p><strong>Entity Type:</strong> <%= @form_details[:entity_type] %></p>
+  <p><strong>Locality:</strong> <%= @form_details[:locality_type] %> - <%= @form_details[:locality] %></p>
 </div>
 
 <div class="alert alert-info">
@@ -12,6 +12,8 @@
 </div>
 
 <%= form_with(url: apply_ai_rules_admin_form_path(@form_id), method: :post) do |form| %>
+  <%= form.hidden_field :cache_key, value: @cache_key %>
+
   <div class="form-actions top-actions">
     <div class="form-check">
       <%= form.check_box :replace_existing, id: "replace_existing", class: "form-check-input" %>
@@ -33,55 +35,65 @@
           </div>
         </div>
 
-        <% rule = @suggested_rules[year.to_s] %>
-        <div class="rule-fields" id="rule_fields_<%= year %>">
-          <div class="field">
-            <label>Due Date:</label>
-            <div class="input-group">
-              <input type="number" name="rules[<%= year %>][dueDate][monthsAfterYearEnd]" value="<%= rule['dueDate']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
-              <span class="input-group-text">months after year end, day</span>
-              <input type="number" name="rules[<%= year %>][dueDate][dayOfMonth]" value="<%= rule['dueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
-            </div>
-          </div>
+        <% # Find a rule that includes this year
+           rule = nil
+           if @suggested_rules && @suggested_rules["calculationRules"]
+             rule = @suggested_rules["calculationRules"].find { |r| r["effectiveYears"] && r["effectiveYears"].include?(year) }
+           end
+        %>
 
-          <div class="field">
-            <label>Extension Due Date:</label>
-            <div class="input-group">
-              <!-- app/views/admin/forms/confirm_ai_rules.html.erb (continued) -->
-              <input type="number" name="rules[<%= year %>][extensionDueDate][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
-              <span class="input-group-text">months after year end, day</span>
-              <input type="number" name="rules[<%= year %>][extensionDueDate][dayOfMonth]" value="<%= rule['extensionDueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
-            </div>
-          </div>
-
-          <% if rule['dueDate']['fiscalYearExceptions'] && rule['dueDate']['fiscalYearExceptions']['06'] %>
-            <div class="fiscal-exception">
-              <h4>Fiscal Year Exception for June (Month 06):</h4>
-
-              <div class="field">
-                <label>Due Date Exception:</label>
-                <div class="input-group">
-                  <input type="number" name="rules[<%= year %>][dueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['dueDate']['fiscalYearExceptions']['06']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
-                  <span class="input-group-text">months after year end, day</span>
-                  <input type="number" name="rules[<%= year %>][dueDate][fiscalYearExceptions][06][dayOfMonth]" value="<%= rule['dueDate']['fiscalYearExceptions']['06']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
-                </div>
-              </div>
-
-              <div class="field">
-                <label>Extension Due Date Exception:</label>
-                <div class="input-group">
-                  <input type="number" name="rules[<%= year %>][extensionDueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['fiscalYearExceptions']['06']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
-                  <span class="input-group-text">months after year end, day</span>
-                  <input type="number" name="rules[<%= year %>][extensionDueDate][fiscalYearExceptions][06][dayOfMonth]" value="<%= rule['extensionDueDate']['fiscalYearExceptions']['06']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
-                </div>
+        <% if rule %>
+          <div class="rule-fields" id="rule_fields_<%= year %>">
+            <div class="field">
+              <label>Due Date:</label>
+              <div class="input-group">
+                <input type="number" name="rules[<%= year %>][dueDate][monthsAfterYearEnd]" value="<%= rule['dueDate']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                <span class="input-group-text">months after year end, day</span>
+                <input type="number" name="rules[<%= year %>][dueDate][dayOfMonth]" value="<%= rule['dueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
               </div>
             </div>
-          <% end %>
-        </div>
+
+            <div class="field">
+              <label>Extension Due Date:</label>
+              <div class="input-group">
+                <input type="number" name="rules[<%= year %>][extensionDueDate][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                <span class="input-group-text">months after year end, day</span>
+                <input type="number" name="rules[<%= year %>][extensionDueDate][dayOfMonth]" value="<%= rule['extensionDueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
+              </div>
+            </div>
+
+            <% if rule['dueDate']['fiscalYearExceptions'] && rule['dueDate']['fiscalYearExceptions']['06'] %>
+              <div class="fiscal-exception">
+                <h4>Fiscal Year Exception for June (Month 06):</h4>
+
+                <div class="field">
+                  <label>Due Date Exception:</label>
+                  <div class="input-group">
+                    <input type="number" name="rules[<%= year %>][dueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['dueDate']['fiscalYearExceptions']['06']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                    <span class="input-group-text">months after year end, day</span>
+                    <input type="number" name="rules[<%= year %>][dueDate][fiscalYearExceptions][06][dayOfMonth]" value="<%= rule['dueDate']['fiscalYearExceptions']['06']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Extension Due Date Exception:</label>
+                  <div class="input-group">
+                    <input type="number" name="rules[<%= year %>][extensionDueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['fiscalYearExceptions']['06']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                    <span class="input-group-text">months after year end, day</span>
+                    <input type="number" name="rules[<%= year %>][extensionDueDate][fiscalYearExceptions][06][dayOfMonth]" value="<%= rule['extensionDueDate']['fiscalYearExceptions']['06']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="rule-fields" id="rule_fields_<%= year %>">
+            <p class="no-rule">No rule generated for this year.</p>
+          </div>
+        <% end %>
       </div>
     <% end %>
   </div>
-
   <div class="form-actions bottom-actions">
     <%= form.submit "Apply All Rules", class: "btn btn-primary" %>
     <a href="<%= edit_admin_form_path(@form_id) %>" class="btn btn-secondary">Cancel</a>
@@ -212,6 +224,23 @@
     .btn-secondary {
         background-color: #6c757d;
         color: white;
+    }
+
+    .alert-info {
+        color: #0c5460;
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+    }
+
+    .no-rule {
+        color: #721c24;
+        padding: 0.75rem;
+        background-color: #f8d7da;
+        border-radius: 0.25rem;
     }
 </style>
 

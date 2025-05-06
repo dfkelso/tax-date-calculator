@@ -120,59 +120,163 @@ class Admin::FormsController < Admin::BaseController
     missing_years = all_years - covered_years
 
     if missing_years.any?
-      # Store form info and missing years in session for the confirmation page
-      session[:form_id] = params[:id]
-      session[:missing_years] = missing_years
-      session[:form_details] = {
-        'formNumber' => @form['formNumber'],
-        'formName' => @form['formName'],
-        'entityType' => @form['entityType'],
-        'localityType' => @form['localityType'],
-        'locality' => @form['locality']
+      # Generate rule suggestions for the missing years
+      form_data = {
+        form_number: @form['formNumber'],
+        form_name: @form['formName'],
+        entity_type: @form['entityType'],
+        locality_type: @form['localityType'],
+        locality: @form['locality']
       }
 
-      # Generate rule suggestions for the missing years
-      suggested_rules = generate_rule_suggestions(@form, missing_years)
-      session[:suggested_rules] = suggested_rules
+      claude_service = ClaudeService.new
+      suggested_rules = claude_service.generate_missing_years(form_data, missing_years, current_rules)
 
-      # Redirect to confirmation page
-      redirect_to confirm_missing_years_admin_form_path(params[:id])
+      # Store the minimal necessary data in the Rails cache instead of session
+      cache_key = "missing_years_#{@form['formNumber']}_#{Time.now.to_i}"
+      Rails.cache.write(cache_key, {
+        form_id: params[:id],
+        missing_years: missing_years,
+        form_details: {
+          'formNumber' => @form['formNumber'],
+          'formName' => @form['formName'],
+          'entityType' => @form['entityType'],
+          'localityType' => @form['localityType'],
+          'locality' => @form['locality']
+        },
+        suggested_rules: suggested_rules
+      }, expires_in: 1.hour)
+
+      # Redirect to confirmation page with just the cache key
+      redirect_to confirm_missing_years_admin_form_path(params[:id], cache_key: cache_key)
     else
       flash[:notice] = "No missing years to fill. All years from #{earliest_year} to #{latest_year} are covered."
       redirect_to edit_admin_form_path(params[:id])
     end
   end
 
-  # AI-assisted rule generation
-  def generate_ai_rules
-    return redirect_to admin_forms_path, alert: 'Form not found.' unless @form
+  def confirm_missing_years
+    # Retrieve data from cache using the key
+    cache_key = params[:cache_key]
+    cached_data = Rails.cache.read(cache_key)
 
-    # Get the form details for the prompt
-    form_details = {
-      'formNumber' => @form['formNumber'],
-      'formName' => @form['formName'],
-      'entityType' => @form['entityType'],
-      'localityType' => @form['localityType'],
-      'locality' => @form['locality'],
-      'extension' => @form['extension']
+    unless cached_data
+      flash[:alert] = "The suggested rules have expired. Please try again."
+      redirect_to edit_admin_form_path(params[:id])
+      return
+    end
+
+    @form_id = cached_data[:form_id]
+    @missing_years = cached_data[:missing_years]
+    @form_details = cached_data[:form_details]
+    @suggested_rules = cached_data[:suggested_rules]
+
+    # Keep the cache key available for the next step
+    @cache_key = cache_key
+  end
+
+  def apply_missing_years
+    # Get the cache key and retrieve data
+    cache_key = params[:cache_key]
+    cached_data = Rails.cache.read(cache_key)
+
+    unless cached_data
+      flash[:alert] = "The suggested rules have expired. Please try again."
+      redirect_to edit_admin_form_path(params[:id])
+      return
+    end
+
+    # Get the form
+    @form = @form_manager.find_form(params[:id])
+
+    unless @form
+      flash[:alert] = "Form not found."
+      redirect_to admin_forms_path
+      return
+    end
+
+    # Initialize the calculation rules array if it doesn't exist
+    @form['calculationRules'] ||= []
+
+    # Parse the rules from params
+    rules_to_apply = JSON.parse(params[:rules].to_json) if params[:rules].present?
+
+    if rules_to_apply
+      # Group rules by their configuration to avoid duplication
+      grouped_rules = {}
+
+      rules_to_apply.each do |year, rule|
+        # Skip years that weren't selected
+        next unless params["include_year_#{year}"] == "1"
+
+        # Generate a unique key based on the rule configuration
+        rule_config = rule.to_json
+
+        grouped_rules[rule_config] ||= {
+          'rule' => rule,
+          'years' => []
+        }
+
+        grouped_rules[rule_config]['years'] << year.to_i
+      end
+
+      # Add each unique rule with its years to the form
+      grouped_rules.each do |_, group_data|
+        rule = group_data['rule']
+        rule['effectiveYears'] = group_data['years'].sort
+        @form['calculationRules'] << rule
+      end
+
+      # Save the updated form
+      if @form_manager.update_form(params[:id], @form)
+        # Clean up the cache
+        Rails.cache.delete(cache_key)
+
+        flash[:notice] = "Successfully added rules for the missing years."
+      else
+        flash[:alert] = "Error updating form rules."
+      end
+    else
+      flash[:alert] = "No rules were provided."
+    end
+
+    redirect_to edit_admin_form_path(params[:id])
+  end
+
+  def generate_ai_rules
+    # Debug the Anthropic gem
+    puts "Anthropic gem version: #{Anthropic::VERSION}"
+    puts "Anthropic::Client initialization parameters: #{Anthropic::Client.instance_method(:initialize).parameters.inspect}"
+    puts "Available methods: #{Anthropic::Client.instance_methods(false).inspect}"
+    # Extract form details
+    form_data = {
+      form_number: @form['formNumber'],
+      form_name: @form['formName'],
+      entity_type: @form['entityType'],
+      locality_type: @form['localityType'],
+      locality: @form['locality']
     }
 
     # Generate years to cover (last 7 years through next year)
     current_year = Date.today.year
-    years_to_cover = ((current_year - 7)..current_year + 1).to_a
+    years_to_cover = ((current_year - 6)..current_year + 1).to_a
 
     # Call Claude API to get suggestions
-    suggestions = claude_api_tax_rules(form_details, years_to_cover)
+    claude_service = ClaudeService.new
+    suggested_rules = claude_service.generate_tax_rules(form_data)
 
-    if suggestions
-      # Store suggestions in session for confirmation page
-      session[:form_id] = params[:id]
-      session[:suggested_years] = years_to_cover
-      session[:form_details] = form_details
-      session[:suggested_rules] = suggestions
+    if suggested_rules
+      # Store in cache instead of session
+      cache_key = "ai_rules_#{@form['formNumber']}_#{Time.now.to_i}"
+      Rails.cache.write(cache_key, {
+        form_id: params[:id],
+        years: years_to_cover,
+        form_details: form_data,
+        suggested_rules: suggested_rules
+      }, expires_in: 1.hour)
 
-      # Redirect to confirmation page
-      redirect_to confirm_ai_rules_admin_form_path(params[:id])
+      # Redirect to confirmation page with just the cache key
+      redirect_to confirm_ai_rules_admin_form_path(params[:id], cache_key: cache_key)
     else
       flash[:alert] = "Failed to generate rule suggestions. Please try again."
       redirect_to edit_admin_form_path(params[:id])
@@ -180,32 +284,38 @@ class Admin::FormsController < Admin::BaseController
   end
 
   def confirm_ai_rules
-    # Display confirmation page with suggested rules
-    @form_id = session[:form_id]
-    @years = session[:suggested_years]
-    @form_details = session[:form_details]
-    @suggested_rules = session[:suggested_rules]
+    # Retrieve data from cache using the key
+    cache_key = params[:cache_key]
+    cached_data = Rails.cache.read(cache_key)
 
-    # Make sure we have all the required data
-    unless @form_id && @years && @form_details && @suggested_rules
-      flash[:alert] = "Missing data for confirmation. Please try again."
+    unless cached_data
+      flash[:alert] = "The suggested rules have expired. Please try again."
       redirect_to edit_admin_form_path(params[:id])
+      return
     end
+
+    @form_id = cached_data[:form_id]
+    @years = cached_data[:years]
+    @form_details = cached_data[:form_details]
+    @suggested_rules = cached_data[:suggested_rules]
+
+    # Keep the cache key available for the next step
+    @cache_key = cache_key
   end
 
   def apply_ai_rules
-    # Get data from params
-    form_id = params[:id]
-    rules_to_apply = JSON.parse(params[:rules]) if params[:rules].present?
+    # Get the cache key and retrieve data
+    cache_key = params[:cache_key]
+    cached_data = Rails.cache.read(cache_key)
 
-    unless form_id && rules_to_apply
-      flash[:alert] = "Missing data for applying rules. Please try again."
-      redirect_to edit_admin_form_path(form_id)
+    unless cached_data
+      flash[:alert] = "The suggested rules have expired. Please try again."
+      redirect_to edit_admin_form_path(params[:id])
       return
     end
 
     # Get the form
-    @form = @form_manager.find_form(form_id)
+    @form = @form_manager.find_form(params[:id])
 
     unless @form
       flash[:alert] = "Form not found."
@@ -217,24 +327,60 @@ class Admin::FormsController < Admin::BaseController
     @form['calculationRules'] = [] if params[:replace_existing] == "1"
     @form['calculationRules'] ||= []
 
-    # Group rules by their configuration to avoid duplication
+    # Parse the rules from params
+    rules_to_apply = {}
+
+    params.each do |key, value|
+      if key.start_with?('rules')
+        # Extract the year and rule parts from the parameter key
+        # Format: rules[2023][dueDate][monthsAfterYearEnd]
+        match = key.match(/rules\[(.*?)\]/)
+        if match
+          year = match[1]
+
+          # Only process years that were selected
+          if params["include_year_#{year}"] == "1"
+            rules_to_apply[year] ||= {}
+
+            # Extract the rest of the parameter key
+            rule_part = key.sub("rules[#{year}]", '')
+
+            # Build a nested structure based on the parameter key
+            current = rules_to_apply[year]
+            parts = rule_part.scan(/\[(.*?)\]/).flatten
+
+            # Navigate to the correct location in the nested structure
+            parts.each_with_index do |part, index|
+              if index == parts.length - 1
+                # This is the last part, set the value
+                current[part] = value
+              else
+                # This is an intermediate part, ensure the nested structure exists
+                current[part] ||= {}
+                current = current[part]
+              end
+            end
+          end
+        end
+      end
+    end
+
+    # Group rules by their configuration
     grouped_rules = {}
 
     rules_to_apply.each do |year, rule|
-      # Create a key based on the rule configuration
-      key = rule_config_key(rule)
+      # Generate a unique key based on the rule configuration
+      rule_config = rule.to_json
 
-      # Initialize the group if it doesn't exist
-      grouped_rules[key] ||= {
+      grouped_rules[rule_config] ||= {
         'rule' => rule,
         'years' => []
       }
 
-      # Add the year to this group
-      grouped_rules[key]['years'] << year.to_i
+      grouped_rules[rule_config]['years'] << year.to_i
     end
 
-    # Create one rule per unique configuration with all applicable years
+    # Add each unique rule with its years to the form
     grouped_rules.each do |_, group_data|
       rule = group_data['rule']
       rule['effectiveYears'] = group_data['years'].sort
@@ -242,105 +388,53 @@ class Admin::FormsController < Admin::BaseController
     end
 
     # Save the updated form
-    if @form_manager.update_form(form_id, @form)
-      # Clear session data
-      session.delete(:form_id)
-      session.delete(:suggested_years)
-      session.delete(:form_details)
-      session.delete(:suggested_rules)
+    if @form_manager.update_form(params[:id], @form)
+      # Clean up the cache
+      Rails.cache.delete(cache_key)
 
       flash[:notice] = "Successfully added AI-generated rules."
     else
       flash[:alert] = "Error updating form rules."
     end
 
-    redirect_to edit_admin_form_path(form_id)
+    redirect_to edit_admin_form_path(params[:id])
   end
 
-  def confirm_missing_years
-    # Display confirmation page with suggested rules
-    @form_id = session[:form_id]
-    @missing_years = session[:missing_years]
-    @form_details = session[:form_details]
-    @suggested_rules = session[:suggested_rules]
-
-    # Make sure we have all the required data
-    unless @form_id && @missing_years && @form_details && @suggested_rules
-      flash[:alert] = "Missing data for confirmation. Please try again."
-      redirect_to edit_admin_form_path(params[:id])
-      return
-    end
-  end
-
-  def apply_missing_years
-    # Get data from params
-    form_id = params[:id]
-    rules_to_apply = JSON.parse(params[:rules]) if params[:rules].present?
-
-    unless form_id && rules_to_apply
-      flash[:alert] = "Missing data for applying rules. Please try again."
-      redirect_to edit_admin_form_path(form_id)
-      return
-    end
-
-    # Get the form
-    @form = @form_manager.find_form(form_id)
+  def update_calculation_rules
+    @form = @form_manager.find_form(params[:id])
 
     unless @form
-      flash[:alert] = "Form not found."
-      redirect_to admin_forms_path
+      render json: { success: false, error: 'Form not found' }, status: :not_found
       return
     end
 
-    # Apply the new rules
+    # Get the new rules from the request
+    new_rules = params[:calculation_rules]
+    existing_years = params[:existing_years] || []
+
+    # Initialize calculation rules array if it doesn't exist
     @form['calculationRules'] ||= []
 
-    # Group rules by their configuration
-    grouped_rules = {}
-
-    rules_to_apply.each do |year, rule|
-      # Create a key based on the rule configuration
-      key = rule_config_key(rule)
-
-      # Initialize the group if it doesn't exist
-      grouped_rules[key] ||= {
-        'rule' => rule,
-        'years' => []
-      }
-
-      # Add the year to this group
-      grouped_rules[key]['years'] << year.to_i
-    end
-
-    # Create one rule per unique configuration with all applicable years
-    grouped_rules.each do |_, group_data|
-      rule = group_data['rule']
-      rule['effectiveYears'] = group_data['years'].sort
-      @form['calculationRules'] << rule
-    end
-
-    # Save the updated form
-    if @form_manager.update_form(form_id, @form)
-      # Clear session data
-      session.delete(:form_id)
-      session.delete(:missing_years)
-      session.delete(:form_details)
-      session.delete(:suggested_rules)
-
-      flash[:notice] = "Successfully added rules for the missing years."
+    # If we're filling missing years, we need to merge with existing rules
+    if existing_years.present?
+      # Keep rules for years that aren't in the new rules
+      @form['calculationRules'] = @form['calculationRules'].select do |rule|
+        rule['effectiveYears'] && (rule['effectiveYears'] - existing_years.map(&:to_i)).present?
+      end
     else
-      flash[:alert] = "Error updating form rules."
+      # If not filling missing years, replace all rules
+      @form['calculationRules'] = []
     end
 
-    redirect_to edit_admin_form_path(form_id)
-  end
+    # Add the new rules
+    @form['calculationRules'] += new_rules
 
-  def export_json
-    form_manager = JsonFormManager.new
-    send_data form_manager.export_json,
-              type: 'application/json',
-              disposition: 'attachment',
-              filename: "tax_forms_#{Date.today.strftime('%Y%m%d')}.json"
+    # Update the form
+    if @form_manager.update_form(params[:id], @form)
+      render json: { success: true }
+    else
+      render json: { success: false, error: 'Failed to update form' }, status: :unprocessable_entity
+    end
   end
 
   private
@@ -387,221 +481,5 @@ class Admin::FormsController < Admin::BaseController
     end
 
     form_data
-  end
-
-  def generate_rule_suggestions(form, missing_years)
-    # Default rule suggestions based on entity type and locality
-    suggested_rules = {}
-
-    missing_years.each do |year|
-      # Create a base rule structure
-      rule = {}
-
-      # Set due dates based on entity type and locality
-      case form['entityType']
-      when 'individual'
-        rule['dueDate'] = {'monthsAfterYearEnd' => 4, 'dayOfMonth' => 15}
-        rule['extensionDueDate'] = {'monthsAfterYearEnd' => 10, 'dayOfMonth' => 15}
-      when 'corporation'
-        rule['dueDate'] = {
-          'monthsAfterYearEnd' => 3,
-          'dayOfMonth' => 15,
-          'fiscalYearExceptions' => {
-            '06' => {
-              'monthsAfterYearEnd' => 4,
-              'dayOfMonth' => 15
-            }
-          }
-        }
-        rule['extensionDueDate'] = {
-          'monthsAfterYearEnd' => 9,
-          'dayOfMonth' => 15,
-          'fiscalYearExceptions' => {
-            '06' => {
-              'monthsAfterYearEnd' => 10,
-              'dayOfMonth' => 15
-            }
-          }
-        }
-      when 'partnership', 'scorp'
-        rule['dueDate'] = {'monthsAfterYearEnd' => 3, 'dayOfMonth' => 15}
-        rule['extensionDueDate'] = {'monthsAfterYearEnd' => 9, 'dayOfMonth' => 15}
-      when 'smllc'
-        if form['localityType'] == 'federal'
-          rule['dueDate'] = {'monthsAfterYearEnd' => 4, 'dayOfMonth' => 15}
-          rule['extensionDueDate'] = {'monthsAfterYearEnd' => 10, 'dayOfMonth' => 15}
-        else
-          rule['dueDate'] = {'monthsAfterYearEnd' => 3, 'dayOfMonth' => 15}
-          rule['extensionDueDate'] = {'monthsAfterYearEnd' => 9, 'dayOfMonth' => 15}
-        end
-      else
-        rule['dueDate'] = {'monthsAfterYearEnd' => 4, 'dayOfMonth' => 15}
-        rule['extensionDueDate'] = {'monthsAfterYearEnd' => 10, 'dayOfMonth' => 15}
-      end
-
-      suggested_rules[year.to_s] = rule
-    end
-
-    suggested_rules
-  end
-
-  def rule_config_key(rule)
-    # Create a unique key based on rule configuration
-    key = "#{rule['dueDate']['monthsAfterYearEnd']}-#{rule['dueDate']['dayOfMonth']}"
-    key += "-#{rule['extensionDueDate']['monthsAfterYearEnd']}-#{rule['extensionDueDate']['dayOfMonth']}" if rule['extensionDueDate']
-
-    # Add fiscal year exceptions to the key if they exist
-    if rule['dueDate']['fiscalYearExceptions']
-      rule['dueDate']['fiscalYearExceptions'].each do |month, exception|
-        key += "-#{month}-#{exception['monthsAfterYearEnd']}-#{exception['dayOfMonth']}"
-
-        # Add extension exceptions if they exist
-        if rule['extensionDueDate'] && rule['extensionDueDate']['fiscalYearExceptions'] &&
-          rule['extensionDueDate']['fiscalYearExceptions'][month]
-          ext = rule['extensionDueDate']['fiscalYearExceptions'][month]
-          key += "-ext-#{month}-#{ext['monthsAfterYearEnd']}-#{ext['dayOfMonth']}"
-        end
-      end
-    end
-
-    key
-  end
-
-  def claude_api_tax_rules(form_details, years)
-    require 'net/http'
-    require 'uri'
-    require 'json'
-
-    # Construct a prompt for Claude API
-    prompt = <<~PROMPT
-    You are an expert tax consultant specializing in tax filing dates. I need your help to determine the correct filing and extension due dates for a tax form with the following details:
-
-    Form Number: #{form_details['formNumber']}
-    Form Name: #{form_details['formName']}
-    Entity Type: #{form_details['entityType']}
-    Locality Type: #{form_details['localityType']}
-    Locality: #{form_details['locality']}
-    #{form_details['extension'] ? "Extension Form: #{form_details['extension']['formNumber']} - #{form_details['extension']['formName']}" : "No extension form specified"}
-    #{form_details['extension'] && form_details['extension']['piggybackFed'] ? "Uses federal extension (piggyback)" : ""}
-
-    For each of the tax years #{years.join(', ')}, please provide:
-    1. The normal filing due date (month and day)
-    2. The extension due date (month and day)
-    3. Any fiscal year exceptions (especially for entities with June year-end)
-    4. Any special rules or considerations for this specific form
-
-    Please format your response as a JSON object with each year as a key. Consider any exceptional circumstances such as COVID-19 extensions for 2019, 2020, and 2021 tax years, disaster relief extensions, or weekend/holiday adjustments.
-    PROMPT
-
-    # For development without actual API, return reasonable defaults
-    # In production, you would call the Claude API here with the prompt
-
-    # Create reasonable defaults based on the form details
-    suggested_rules = {}
-
-    years.each do |year|
-      # Create a base rule structure
-      rule = {}
-
-      # Set due dates based on entity type and locality
-      case form_details['entityType']
-      when 'individual'
-        rule['dueDate'] = {'monthsAfterYearEnd' => 4, 'dayOfMonth' => 15}
-        rule['extensionDueDate'] = {'monthsAfterYearEnd' => 10, 'dayOfMonth' => 15}
-
-        # Handle COVID extensions for 2019, 2020, 2021
-        if year == 2019
-          rule['dueDate'] = {'monthsAfterYearEnd' => 7, 'dayOfMonth' => 15} # July 15, 2020 for 2019 returns
-        elsif year == 2020
-          rule['dueDate'] = {'monthsAfterYearEnd' => 5, 'dayOfMonth' => 17} # May 17, 2021 for 2020 returns
-        elsif year == 2021
-          rule['dueDate'] = {'monthsAfterYearEnd' => 4, 'dayOfMonth' => 18} # April 18, 2022 for 2021 returns
-        end
-
-      when 'corporation'
-        rule['dueDate'] = {
-          'monthsAfterYearEnd' => 3,
-          'dayOfMonth' => 15,
-          'fiscalYearExceptions' => {
-            '06' => {
-              'monthsAfterYearEnd' => 4,
-              'dayOfMonth' => 15
-            }
-          }
-        }
-        rule['extensionDueDate'] = {
-          'monthsAfterYearEnd' => 9,
-          'dayOfMonth' => 15,
-          'fiscalYearExceptions' => {
-            '06' => {
-              'monthsAfterYearEnd' => 10,
-              'dayOfMonth' => 15
-            }
-          }
-        }
-
-        # Handle COVID extensions for corporations
-        if year == 2019 && form_details['localityType'] == 'federal'
-          rule['dueDate']['monthsAfterYearEnd'] = 7
-          rule['dueDate']['dayOfMonth'] = 15
-          if rule['dueDate']['fiscalYearExceptions'] && rule['dueDate']['fiscalYearExceptions']['06']
-            rule['dueDate']['fiscalYearExceptions']['06']['monthsAfterYearEnd'] = 7
-            rule['dueDate']['fiscalYearExceptions']['06']['dayOfMonth'] = 15
-          end
-        end
-
-      when 'partnership', 'scorp'
-        rule['dueDate'] = {'monthsAfterYearEnd' => 3, 'dayOfMonth' => 15}
-        rule['extensionDueDate'] = {'monthsAfterYearEnd' => 9, 'dayOfMonth' => 15}
-
-        # Handle COVID extensions
-        if year == 2019 && form_details['localityType'] == 'federal'
-          rule['dueDate'] = {'monthsAfterYearEnd' => 7, 'dayOfMonth' => 15}
-        end
-
-      when 'smllc'
-        if form_details['localityType'] == 'federal'
-          rule['dueDate'] = {'monthsAfterYearEnd' => 4, 'dayOfMonth' => 15}
-          rule['extensionDueDate'] = {'monthsAfterYearEnd' => 10, 'dayOfMonth' => 15}
-        else
-          # State-specific default
-          rule['dueDate'] = {'monthsAfterYearEnd' => 3, 'dayOfMonth' => 15}
-          rule['extensionDueDate'] = {'monthsAfterYearEnd' => 9, 'dayOfMonth' => 15}
-        end
-
-        # Handle COVID extensions
-        if year == 2019 && form_details['localityType'] == 'federal'
-          rule['dueDate'] = {'monthsAfterYearEnd' => 7, 'dayOfMonth' => 15}
-        end
-      else
-        # Default fallback
-        rule['dueDate'] = {'monthsAfterYearEnd' => 4, 'dayOfMonth' => 15}
-        rule['extensionDueDate'] = {'monthsAfterYearEnd' => 10, 'dayOfMonth' => 15}
-      end
-
-      # Special handling for specific states
-      if form_details['localityType'] == 'state'
-        case form_details['locality']
-        when 'California'
-          # Match federal due dates
-          if year == 2019
-            rule['dueDate'] = {'monthsAfterYearEnd' => 7, 'dayOfMonth' => 15}
-          elsif year == 2020
-            rule['dueDate'] = {'monthsAfterYearEnd' => 5, 'dayOfMonth' => 17}
-          end
-        when 'Texas'
-          # Texas has specific franchise tax dates
-          if ['corporation', 'scorp', 'partnership', 'smllc'].include?(form_details['entityType'])
-            rule['dueDate'] = {'monthsAfterYearStart' => 5, 'dayOfMonth' => 15}
-            rule['extensionDueDate'] = {'monthsAfterYearStart' => 11, 'dayOfMonth' => 15}
-          end
-        end
-      end
-
-      # Store the suggested rule for this year
-      suggested_rules[year.to_s] = rule
-    end
-
-    suggested_rules
   end
 end
