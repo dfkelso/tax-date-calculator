@@ -9,87 +9,36 @@ class JsonFormManager
   end
 
   def find_form(id)
-    form_index = id.to_i - 1
-    return nil if form_index < 0 || form_index >= all_forms.length
-    all_forms[form_index]
+    id = id.to_i
+    index = id - 1
+    return nil if index < 0 || index >= all_forms.length
+    all_forms[index]
   end
 
   def add_form(form_data)
     @data['forms'] << form_data
     save_json
-    true
-  rescue
-    false
   end
 
   def update_form(id, form_data)
-    form_index = id.to_i - 1
-    return false if form_index < 0 || form_index >= all_forms.length
+    id = id.to_i
+    index = id - 1
+    return false if index < 0 || index >= all_forms.length
 
-    # Ensure deep cloning of the data
-    @data['forms'][form_index] = deep_clone(form_data)
+    # Make a deep copy to avoid reference issues
+    @data['forms'][index] = JSON.parse(form_data.to_json)
+
+    # Save to file
     save_json
-    true
-  rescue => e
-    Rails.logger.error("Error updating form: #{e.message}")
-    Rails.logger.error(e.backtrace.join("\n"))
-    false
-  end
-
-  private
-
-  def deep_clone(obj)
-    JSON.parse(obj.to_json)
   end
 
   def delete_form(id)
-    form_index = id.to_i - 1
-    return false if form_index < 0 || form_index >= all_forms.length
+    id = id.to_i
+    index = id - 1
+    return false if index < 0 || index >= all_forms.length
 
-    @data['forms'].delete_at(form_index)
+    @data['forms'].delete_at(index)
     save_json
-    true
-  rescue
-    false
-  end
-
-  def add_calculation_rule(form_id, rule_data)
-    form = find_form(form_id)
-    return false unless form
-
-    form['calculationRules'] ||= []
-    form['calculationRules'] << rule_data
-    save_json
-    true
-  rescue => e
-    puts "Error adding calculation rule: #{e.message}"
-    false
-  end
-
-  def update_calculation_rule(form_id, rule_index, rule_data)
-    form = find_form(form_id)
-    return false unless form
-    return false unless form['calculationRules'] && rule_index.to_i < form['calculationRules'].length
-
-    form['calculationRules'][rule_index.to_i] = rule_data
-    save_json
-    true
-  rescue => e
-    puts "Error updating calculation rule: #{e.message}"
-    false
-  end
-
-  def delete_calculation_rule(form_id, rule_index)
-    form = find_form(form_id)
-    return false unless form
-    return false unless form['calculationRules'] && rule_index.to_i < form['calculationRules'].length
-
-    form['calculationRules'].delete_at(rule_index.to_i)
-    save_json
-    true
-  rescue => e
-    puts "Error deleting calculation rule: #{e.message}"
-    false
   end
 
   def export_json
@@ -101,8 +50,8 @@ class JsonFormManager
       @data = JSON.parse(json_string)
       save_json
       true
-    rescue JSON::ParserError => e
-      puts "Error parsing JSON: #{e.message}"
+    rescue => e
+      Rails.logger.error("Error importing JSON: #{e.message}")
       false
     end
   end
@@ -111,12 +60,46 @@ class JsonFormManager
 
   def load_json
     JSON.parse(File.read(@json_path))
-  rescue Errno::ENOENT, JSON::ParserError => e
-    puts "Error loading JSON: #{e.message}"
+  rescue => e
+    Rails.logger.error("Error loading JSON: #{e.message}")
     { 'forms' => [] }
   end
 
+  # In app/services/json_form_manager.rb
   def save_json
-    File.write(@json_path, JSON.pretty_generate(@data))
+    # Make absolutely sure we're writing to the right file
+    Rails.logger.info("Writing JSON to: #{@json_path}")
+    Rails.logger.info("JSON content size: #{@data['forms'].size}")
+
+    # Print the content of the form we're trying to update
+    form_index = 29  # Form 30 is at index 29
+    if form_index < @data['forms'].size
+      Rails.logger.info("Form 30 calculation rules before save: #{@data['forms'][form_index]['calculationRules'].inspect}")
+    end
+
+    # Write with explicit options
+    File.open(@json_path, 'w') do |file|
+      file.write(JSON.pretty_generate(@data))
+    end
+
+    # Verify the file was written
+    Rails.logger.info("File exists after save: #{File.exist?(@json_path)}")
+    Rails.logger.info("File size after save: #{File.size(@json_path)} bytes")
+
+    # Reload to verify save worked
+    begin
+      temp_data = JSON.parse(File.read(@json_path))
+      Rails.logger.info("Successfully read back JSON with #{temp_data['forms'].size} forms")
+
+      # Verify the form was updated in the file
+      if form_index < temp_data['forms'].size
+        Rails.logger.info("Form 30 calculation rules after reload: #{temp_data['forms'][form_index]['calculationRules'].inspect}")
+      end
+    rescue => e
+      Rails.logger.error("Error reloading JSON: #{e.message}")
+      return false
+    end
+
+    true
   end
 end
