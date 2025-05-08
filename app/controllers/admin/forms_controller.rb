@@ -1,7 +1,7 @@
 # app/controllers/admin/forms_controller.rb
 class Admin::FormsController < Admin::BaseController
   before_action :set_form, only: [:edit, :update, :destroy, :preview_dates, :fill_missing_years, :generate_ai_rules, :confirm_ai_rules, :apply_ai_rules]
-  before_action :set_form_manager, only: [:index, :new, :create, :edit, :update, :destroy, :preview_dates, :fill_missing_years, :generate_ai_rules, :confirm_ai_rules, :apply_ai_rules]
+  before_action :set_form_manager, only: [:index, :new, :create, :edit, :update, :destroy, :preview_dates, :fill_missing_years, :generate_ai_rules, :confirm_ai_rules, :apply_ai_rules, :apply_missing_years]
 
   def index
     @forms = @form_manager.all_forms
@@ -182,15 +182,7 @@ class Admin::FormsController < Admin::BaseController
   end
 
   def apply_missing_years
-    # Get the cache key and retrieve data
-    cache_key = params[:cache_key]
-    cached_data = Rails.cache.read(cache_key)
-
-    unless cached_data
-      flash[:alert] = "The suggested rules have expired. Please try again."
-      redirect_to edit_admin_form_path(params[:id])
-      return
-    end
+    @form_manager = JsonFormManager.new
 
     # Get the form
     @form = @form_manager.find_form(params[:id])
@@ -208,36 +200,54 @@ class Admin::FormsController < Admin::BaseController
     rules_to_apply = JSON.parse(params[:rules].to_json) if params[:rules].present?
 
     if rules_to_apply
-      # Group rules by their configuration to avoid duplication
-      grouped_rules = {}
-
+      # Process each selected year
       rules_to_apply.each do |year, rule|
         # Skip years that weren't selected
         next unless params["include_year_#{year}"] == "1"
 
-        # Generate a unique key based on the rule configuration
-        rule_config = rule.to_json
+        year_int = year.to_i
 
-        grouped_rules[rule_config] ||= {
-          'rule' => rule,
-          'years' => []
-        }
+        # Check if there's already a matching rule we can merge with
+        found_match = false
 
-        grouped_rules[rule_config]['years'] << year.to_i
-      end
+        @form['calculationRules'].each do |existing_rule|
+          # Skip if the rule structure doesn't match what we're looking for
+          next unless existing_rule['dueDate'] && existing_rule['extensionDueDate']
 
-      # Add each unique rule with its years to the form
-      grouped_rules.each do |_, group_data|
-        rule = group_data['rule']
-        rule['effectiveYears'] = group_data['years'].sort
-        @form['calculationRules'] << rule
+          # Compare the due date parameters
+          if existing_rule['dueDate']['monthsAfterYearEnd'].to_i == rule['dueDate']['monthsAfterYearEnd'].to_i &&
+            existing_rule['dueDate']['dayOfMonth'].to_i == rule['dueDate']['dayOfMonth'].to_i &&
+            existing_rule['extensionDueDate']['monthsAfterYearEnd'].to_i == rule['extensionDueDate']['monthsAfterYearEnd'].to_i &&
+            existing_rule['extensionDueDate']['dayOfMonth'].to_i == rule['extensionDueDate']['dayOfMonth'].to_i
+
+            # Found a match! Add this year to the existing rule's years
+            existing_rule['effectiveYears'] ||= []
+            existing_rule['effectiveYears'] << year_int
+            existing_rule['effectiveYears'] = existing_rule['effectiveYears'].uniq.sort
+            found_match = true
+            break
+          end
+        end
+
+        # If no match was found, create a new rule
+        unless found_match
+          new_rule = {
+            'effectiveYears' => [year_int],
+            'dueDate' => {
+              'monthsAfterYearEnd' => rule['dueDate']['monthsAfterYearEnd'].to_i,
+              'dayOfMonth' => rule['dueDate']['dayOfMonth'].to_i
+            },
+            'extensionDueDate' => {
+              'monthsAfterYearEnd' => rule['extensionDueDate']['monthsAfterYearEnd'].to_i,
+              'dayOfMonth' => rule['extensionDueDate']['dayOfMonth'].to_i
+            }
+          }
+          @form['calculationRules'] << new_rule
+        end
       end
 
       # Save the updated form
       if @form_manager.update_form(params[:id], @form)
-        # Clean up the cache
-        Rails.cache.delete(cache_key)
-
         flash[:notice] = "Successfully added rules for the missing years."
       else
         flash[:alert] = "Error updating form rules."

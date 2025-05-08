@@ -1045,24 +1045,28 @@
       "calculationRules": [
         {
           "effectiveYears": [
-            2020
+            2019,
+            2021,
+            2022,
+            2023,
+            2024,
+            2025
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 7,
+            "monthsAfterYearEnd": 5,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterYearEnd": 11,
             "dayOfMonth": 15
           }
         },
         {
           "effectiveYears": [
-            2021,
-            2022
+            2020
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 5,
+            "monthsAfterYearEnd": 7,
             "dayOfMonth": 15
           },
           "extensionDueDate": {

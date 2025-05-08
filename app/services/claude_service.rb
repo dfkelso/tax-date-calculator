@@ -20,8 +20,8 @@ class ClaudeService
     result
   end
 
-  def generate_missing_years(form_data, missing_years, existing_rules)
-    prompt = build_missing_years_prompt(form_data, missing_years, existing_rules)
+  def generate_missing_years(form_data)
+    prompt = build_missing_years_prompt(form_data)
 
     response = make_claude_request(prompt)
     result = parse_response(response)
