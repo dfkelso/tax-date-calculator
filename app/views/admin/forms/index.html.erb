@@ -1,5 +1,20 @@
-<!-- app/views/admin/forms/index.html.erb -->
-<h1>Tax Forms</h1>
+<!-- app/views/admin/forms/index.html.erb - REPLACE THE ENTIRE FILE -->
+<div class="page-header">
+  <h1>Tax Forms Administration</h1>
+  <div class="header-actions">
+    <a href="<%= new_admin_form_path %>" class="btn btn-primary">Add New Form</a>
+    <a href="<%= admin_export_json_path %>" class="btn btn-secondary">Export JSON</a>
+
+    <%= form_with(url: admin_import_json_path, method: :post, multipart: true, class: "import-form") do |form| %>
+      <%= form.file_field :json_file, accept: ".json", class: "file-input" %>
+      <%= form.submit "Import JSON", class: "btn btn-secondary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <p><strong>Total Forms:</strong> <%= @forms.count %></p>
+</div>
 
 <div class="grid-container">
   <div class="toolbar">
@@ -27,9 +42,6 @@
         <span class="slider round"></span>
         <span class="toggle-label">Full Width</span>
       </label>
-
-      <a href="<%= new_admin_form_path %>" class="add-btn">Add New Form</a>
-      <a href="<%= admin_export_json_path %>" class="export-btn">Export JSON</a>
     </div>
   </div>
 
@@ -236,6 +248,54 @@
         justify-content: flex-end;
         gap: 10px;
         margin-top: 20px;
+    }
+
+    /* Page header styles */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        cursor: pointer;
+        font-weight: 500;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .stats-bar {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+    }
+
+    .import-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 </style>
 

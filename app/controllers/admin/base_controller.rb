@@ -1,8 +1,9 @@
+# app/controllers/admin/base_controller.rb - REPLACE THE ENTIRE CLASS
 class Admin::BaseController < ApplicationController
   layout 'admin'
 
   def index
-    @form_count = JsonFormManager.new.all_forms.count
+    redirect_to admin_forms_path
   end
 
   def export_json

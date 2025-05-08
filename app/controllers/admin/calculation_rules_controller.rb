@@ -63,7 +63,7 @@ class Admin::CalculationRulesController < Admin::BaseController
     rule_data = {
       'effectiveYears' => effective_years,
       'dueDate' => {
-        'monthsAfterYearEnd' => params[:due_months_after_year_end].to_i,
+        'monthsAfterCalculationBase' => params[:due_months_after_year_end].to_i,
         'dayOfMonth' => params[:due_day_of_month].to_i
       }
     }
@@ -71,7 +71,7 @@ class Admin::CalculationRulesController < Admin::BaseController
     # Add extension due date if present
     if params[:extension_months_after_year_end].present?
       rule_data['extensionDueDate'] = {
-        'monthsAfterYearEnd' => params[:extension_months_after_year_end].to_i,
+        'monthsAfterCalculationBase' => params[:extension_months_after_year_end].to_i,
         'dayOfMonth' => params[:extension_day_of_month].to_i
       }
     end
@@ -81,7 +81,7 @@ class Admin::CalculationRulesController < Admin::BaseController
       month = params[:fiscal_year_exception_month].to_s.rjust(2, '0')
       rule_data['dueDate']['fiscalYearExceptions'] = {
         month => {
-          'monthsAfterYearEnd' => params[:fiscal_due_months_after_year_end].to_i,
+          'monthsAfterCalculationBase' => params[:fiscal_due_months_after_year_end].to_i,
           'dayOfMonth' => params[:fiscal_due_day_of_month].to_i
         }
       }
@@ -90,7 +90,7 @@ class Admin::CalculationRulesController < Admin::BaseController
         rule_data['extensionDueDate'] ||= {}
         rule_data['extensionDueDate']['fiscalYearExceptions'] = {
           month => {
-            'monthsAfterYearEnd' => params[:fiscal_extension_months_after_year_end].to_i,
+            'monthsAfterCalculationBase' => params[:fiscal_extension_months_after_year_end].to_i,
             'dayOfMonth' => params[:fiscal_extension_day_of_month].to_i
           }
         }

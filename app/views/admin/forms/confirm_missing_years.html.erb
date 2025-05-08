@@ -37,7 +37,7 @@
             <div class="field">
               <label>Due Date:</label>
               <div class="input-group">
-                <input type="number" name="rules[<%= year %>][dueDate][monthsAfterYearEnd]" value="<%= rule['dueDate']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                <input type="number" name="rules[<%= year %>][dueDate][monthsAfterYearEnd]" value="<%= rule['dueDate']['monthsAfterCalculationBase'] %>" min="1" max="12" class="form-control" />
                 <span class="input-group-text">months after year end, day</span>
                 <input type="number" name="rules[<%= year %>][dueDate][dayOfMonth]" value="<%= rule['dueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
               </div>
@@ -46,7 +46,7 @@
             <div class="field">
               <label>Extension Due Date:</label>
               <div class="input-group">
-                <input type="number" name="rules[<%= year %>][extensionDueDate][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                <input type="number" name="rules[<%= year %>][extensionDueDate][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['monthsAfterCalculationBase'] %>" min="1" max="12" class="form-control" />
                 <span class="input-group-text">months after year end, day</span>
                 <input type="number" name="rules[<%= year %>][extensionDueDate][dayOfMonth]" value="<%= rule['extensionDueDate']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
               </div>
@@ -59,7 +59,7 @@
                 <div class="field">
                   <label>Due Date Exception:</label>
                   <div class="input-group">
-                    <input type="number" name="rules[<%= year %>][dueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['dueDate']['fiscalYearExceptions']['06']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                    <input type="number" name="rules[<%= year %>][dueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['dueDate']['fiscalYearExceptions']['06']['monthsAfterCalculationBase'] %>" min="1" max="12" class="form-control" />
                     <span class="input-group-text">months after year end, day</span>
                     <input type="number" name="rules[<%= year %>][dueDate][fiscalYearExceptions][06][dayOfMonth]" value="<%= rule['dueDate']['fiscalYearExceptions']['06']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
                   </div>
@@ -68,7 +68,7 @@
                 <div class="field">
                   <label>Extension Due Date Exception:</label>
                   <div class="input-group">
-                    <input type="number" name="rules[<%= year %>][extensionDueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['fiscalYearExceptions']['06']['monthsAfterYearEnd'] %>" min="1" max="12" class="form-control" />
+                    <input type="number" name="rules[<%= year %>][extensionDueDate][fiscalYearExceptions][06][monthsAfterYearEnd]" value="<%= rule['extensionDueDate']['fiscalYearExceptions']['06']['monthsAfterCalculationBase'] %>" min="1" max="12" class="form-control" />
                     <span class="input-group-text">months after year end, day</span>
                     <input type="number" name="rules[<%= year %>][extensionDueDate][fiscalYearExceptions][06][dayOfMonth]" value="<%= rule['extensionDueDate']['fiscalYearExceptions']['06']['dayOfMonth'] %>" min="1" max="31" class="form-control" />
                   </div>

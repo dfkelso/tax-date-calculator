@@ -215,9 +215,9 @@ class Admin::FormsController < Admin::BaseController
           next unless existing_rule['dueDate'] && existing_rule['extensionDueDate']
 
           # Compare the due date parameters
-          if existing_rule['dueDate']['monthsAfterYearEnd'].to_i == rule['dueDate']['monthsAfterYearEnd'].to_i &&
+          if existing_rule['dueDate']['monthsAfterCalculationBase'].to_i == rule['dueDate']['monthsAfterCalculationBase'].to_i &&
             existing_rule['dueDate']['dayOfMonth'].to_i == rule['dueDate']['dayOfMonth'].to_i &&
-            existing_rule['extensionDueDate']['monthsAfterYearEnd'].to_i == rule['extensionDueDate']['monthsAfterYearEnd'].to_i &&
+            existing_rule['extensionDueDate']['monthsAfterCalculationBase'].to_i == rule['extensionDueDate']['monthsAfterCalculationBase'].to_i &&
             existing_rule['extensionDueDate']['dayOfMonth'].to_i == rule['extensionDueDate']['dayOfMonth'].to_i
 
             # Found a match! Add this year to the existing rule's years
@@ -234,11 +234,11 @@ class Admin::FormsController < Admin::BaseController
           new_rule = {
             'effectiveYears' => [year_int],
             'dueDate' => {
-              'monthsAfterYearEnd' => rule['dueDate']['monthsAfterYearEnd'].to_i,
+              'monthsAfterCalculationBase' => rule['dueDate']['monthsAfterCalculationBase'].to_i,
               'dayOfMonth' => rule['dueDate']['dayOfMonth'].to_i
             },
             'extensionDueDate' => {
-              'monthsAfterYearEnd' => rule['extensionDueDate']['monthsAfterYearEnd'].to_i,
+              'monthsAfterCalculationBase' => rule['extensionDueDate']['monthsAfterCalculationBase'].to_i,
               'dayOfMonth' => rule['extensionDueDate']['dayOfMonth'].to_i
             }
           }
@@ -357,11 +357,11 @@ class Admin::FormsController < Admin::BaseController
       # Create the new rule structure for this year
       new_rule = {
         'dueDate' => {
-          'monthsAfterYearEnd' => rule_data.dig('dueDate', 'monthsAfterYearEnd').to_i,
+          'monthsAfterCalculationBase' => rule_data.dig('dueDate', 'monthsAfterCalculationBase').to_i,
           'dayOfMonth' => rule_data.dig('dueDate', 'dayOfMonth').to_i
         },
         'extensionDueDate' => {
-          'monthsAfterYearEnd' => rule_data.dig('extensionDueDate', 'monthsAfterYearEnd').to_i,
+          'monthsAfterCalculationBase' => rule_data.dig('extensionDueDate', 'monthsAfterCalculationBase').to_i,
           'dayOfMonth' => rule_data.dig('extensionDueDate', 'dayOfMonth').to_i
         }
       }
@@ -372,9 +372,9 @@ class Admin::FormsController < Admin::BaseController
         next unless existing_rule['dueDate'] && existing_rule['extensionDueDate']
 
         # Check if the due date and extension due date match
-        if existing_rule['dueDate']['monthsAfterYearEnd'] == new_rule['dueDate']['monthsAfterYearEnd'] &&
+        if existing_rule['dueDate']['monthsAfterCalculationBase'] == new_rule['dueDate']['monthsAfterCalculationBase'] &&
           existing_rule['dueDate']['dayOfMonth'] == new_rule['dueDate']['dayOfMonth'] &&
-          existing_rule['extensionDueDate']['monthsAfterYearEnd'] == new_rule['extensionDueDate']['monthsAfterYearEnd'] &&
+          existing_rule['extensionDueDate']['monthsAfterCalculationBase'] == new_rule['extensionDueDate']['monthsAfterCalculationBase'] &&
           existing_rule['extensionDueDate']['dayOfMonth'] == new_rule['extensionDueDate']['dayOfMonth']
 
           # Found a matching rule
@@ -494,12 +494,12 @@ class Admin::FormsController < Admin::BaseController
     if form_data['calculationRules']
       form_data['calculationRules'].each do |rule|
         if rule['dueDate']
-          rule['dueDate']['monthsAfterYearEnd'] = rule['dueDate']['monthsAfterYearEnd'].to_i if rule['dueDate']['monthsAfterYearEnd']
+          rule['dueDate']['monthsAfterCalculationBase'] = rule['dueDate']['monthsAfterCalculationBase'].to_i if rule['dueDate']['monthsAfterCalculationBase']
           rule['dueDate']['dayOfMonth'] = rule['dueDate']['dayOfMonth'].to_i if rule['dueDate']['dayOfMonth']
         end
 
         if rule['extensionDueDate']
-          rule['extensionDueDate']['monthsAfterYearEnd'] = rule['extensionDueDate']['monthsAfterYearEnd'].to_i if rule['extensionDueDate']['monthsAfterYearEnd']
+          rule['extensionDueDate']['monthsAfterCalculationBase'] = rule['extensionDueDate']['monthsAfterCalculationBase'].to_i if rule['extensionDueDate']['monthsAfterCalculationBase']
           rule['extensionDueDate']['dayOfMonth'] = rule['extensionDueDate']['dayOfMonth'].to_i if rule['extensionDueDate']['dayOfMonth']
         end
       end

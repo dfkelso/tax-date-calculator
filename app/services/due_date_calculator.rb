@@ -90,8 +90,8 @@ class DueDateCalculator
     if date_rule['fiscalYearExceptions'] && date_rule['fiscalYearExceptions'][base_month]
       exception = date_rule['fiscalYearExceptions'][base_month]
 
-      if exception['monthsAfterYearEnd']
-        months_to_add = exception['monthsAfterYearEnd']
+      if exception['monthsAfterCalculationBase']
+        months_to_add = exception['monthsAfterCalculationBase']
       elsif exception['monthsAfterYearStart']
         months_to_add = exception['monthsAfterYearStart']
         reference_date = Date.new(year, 1, 1)
@@ -100,8 +100,8 @@ class DueDateCalculator
       day_of_month = exception['dayOfMonth'] if exception['dayOfMonth']
     else
       # Use standard rules
-      if date_rule['monthsAfterYearEnd']
-        months_to_add = date_rule['monthsAfterYearEnd']
+      if date_rule['monthsAfterCalculationBase']
+        months_to_add = date_rule['monthsAfterCalculationBase']
       elsif date_rule['monthsAfterYearStart']
         months_to_add = date_rule['monthsAfterYearStart']
         reference_date = Date.new(year, 1, 1)

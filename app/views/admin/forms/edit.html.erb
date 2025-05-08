@@ -164,10 +164,10 @@
               <div class="rule-info">
                 <p><strong>Effective Years:</strong> <%= rule['effectiveYears'].join(', ') %></p>
 
-                <p><strong>Due Date:</strong> <%= rule.dig('dueDate', 'monthsAfterYearEnd') %> months after year end, day <%= rule.dig('dueDate', 'dayOfMonth') %></p>
+                <p><strong>Due Date:</strong> <%= rule.dig('dueDate', 'monthsAfterCalculationBase') %> months after year end, day <%= rule.dig('dueDate', 'dayOfMonth') %></p>
 
                 <% if rule.dig('extensionDueDate') %>
-                  <p><strong>Extension Due Date:</strong> <%= rule.dig('extensionDueDate', 'monthsAfterYearEnd') %> months after year end, day <%= rule.dig('extensionDueDate', 'dayOfMonth') %></p>
+                  <p><strong>Extension Due Date:</strong> <%= rule.dig('extensionDueDate', 'monthsAfterCalculationBase') %> months after year end, day <%= rule.dig('extensionDueDate', 'dayOfMonth') %></p>
                 <% end %>
 
                 <% if rule.dig('dueDate', 'fiscalYearExceptions') %>
@@ -176,7 +176,7 @@
                     <ul>
                       <% rule.dig('dueDate', 'fiscalYearExceptions').each do |month, exception| %>
                         <li>
-                          Month <%= month %>: <%= exception['monthsAfterYearEnd'] %> months after year end, day <%= exception['dayOfMonth'] %>
+                          Month <%= month %>: <%= exception['monthsAfterCalculationBase'] %> months after year end, day <%= exception['dayOfMonth'] %>
                         </li>
                       <% end %>
                     </ul>

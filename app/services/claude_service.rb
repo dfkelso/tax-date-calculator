@@ -130,22 +130,22 @@ class ClaudeService
         {
           "effectiveYears": [2020],
           "dueDate": {
-            "monthsAfterYearEnd": 7,
+            "monthsAfterCalculationBase": 7,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
+            "monthsAfterCalculationBase": 11,
             "dayOfMonth": 15
           }
         },
         {
           "effectiveYears": [2019, 2021, 2022, 2023, 2024, 2025, 2026],
           "dueDate": {
-            "monthsAfterYearEnd": 5,
+            "monthsAfterCalculationBase": 5,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
+            "monthsAfterCalculationBase": 11,
             "dayOfMonth": 15
           }
         }
@@ -160,14 +160,14 @@ class ClaudeService
     ```
     "fiscalYearExceptions": {
       "06": {  // For June fiscal year end
-        "monthsAfterYearEnd": 4,
+        "monthsAfterCalculationBase": 4,
         "dayOfMonth": 15
       }
     }
     ```
 
     CALCULATION BASES:
-    - Most tax due dates are calculated as "monthsAfterYearEnd" 
+    - Most tax due dates are calculated as "monthsAfterCalculationBase" 
     - If you discover that dates should be calculated from the beginning of the year, use "monthsAfterYearStart" instead
 
     RULES FOR DETERMINING CALCULATIONS:
@@ -214,11 +214,11 @@ class ClaudeService
         {
           "effectiveYears": [2019],
           "dueDate": {
-            "monthsAfterYearEnd": 5,
+            "monthsAfterCalculationBase": 5,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
+            "monthsAfterCalculationBase": 11,
             "dayOfMonth": 15
           }
         }
@@ -234,7 +234,7 @@ class ClaudeService
     ```
     "fiscalYearExceptions": {
       "06": {  // For June fiscal year end
-        "monthsAfterYearEnd": 4,
+        "monthsAfterCalculationBase": 4,
         "dayOfMonth": 15
       }
     }
@@ -246,7 +246,7 @@ class ClaudeService
       make sure there's a good reason if your rule differs from the 2021-2023 pattern.
 
     CALCULATION BASES:
-    - Most tax due dates are calculated as "monthsAfterYearEnd" 
+    - Most tax due dates are calculated as "monthsAfterCalculationBase" 
     - If you discover that dates should be calculated from the beginning of the year, use "monthsAfterYearStart" instead
 
     RULES FOR DETERMINING CALCULATIONS:

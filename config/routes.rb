@@ -12,7 +12,7 @@ Rails.application.routes.draw do
 
   # Admin interface routes
   namespace :admin do
-    root to: 'base#index'
+    root to: 'forms#index'
 
     resources :forms do
       member do

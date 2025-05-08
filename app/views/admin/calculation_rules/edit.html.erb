@@ -16,7 +16,7 @@
     <div class="field-group">
       <div class="field">
         <%= form.label :due_months_after_year_end, "Months After Year End:" %>
-        <%= form.number_field :due_months_after_year_end, value: @rule.dig('dueDate', 'monthsAfterYearEnd'), min: 0, max: 24, required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+        <%= form.number_field :due_months_after_year_end, value: @rule.dig('dueDate', 'monthsAfterCalculationBase'), min: 0, max: 24, required: true, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
       </div>
 
       <div class="field">
@@ -32,7 +32,7 @@
     <div class="field-group">
       <div class="field">
         <%= form.label :extension_months_after_year_end, "Months After Year End:" %>
-        <%= form.number_field :extension_months_after_year_end, value: @rule.dig('extensionDueDate', 'monthsAfterYearEnd'), min: 0, max: 24, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
+        <%= form.number_field :extension_months_after_year_end, value: @rule.dig('extensionDueDate', 'monthsAfterCalculationBase'), min: 0, max: 24, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
       </div>
 
       <div class="field">
@@ -66,7 +66,7 @@
           fiscal_due_months = nil
           if fiscal_month && @rule.dig('dueDate', 'fiscalYearExceptions')
             month_key = fiscal_month.to_s.rjust(2, '0')
-            fiscal_due_months = @rule.dig('dueDate', 'fiscalYearExceptions', month_key, 'monthsAfterYearEnd')
+            fiscal_due_months = @rule.dig('dueDate', 'fiscalYearExceptions', month_key, 'monthsAfterCalculationBase')
           end
         %>
         <%= form.number_field :fiscal_due_months_after_year_end, value: fiscal_due_months, min: 0, max: 24, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>
@@ -92,7 +92,7 @@
           fiscal_ext_months = nil
           if fiscal_month && @rule.dig('extensionDueDate', 'fiscalYearExceptions')
             month_key = fiscal_month.to_s.rjust(2, '0')
-            fiscal_ext_months = @rule.dig('extensionDueDate', 'fiscalYearExceptions', month_key, 'monthsAfterYearEnd')
+            fiscal_ext_months = @rule.dig('extensionDueDate', 'fiscalYearExceptions', month_key, 'monthsAfterCalculationBase')
           end
         %>
         <%= form.number_field :fiscal_extension_months_after_year_end, value: fiscal_ext_months, min: 0, max: 24, style: "width: 100%; padding: 8px; box-sizing: border-box;" %>

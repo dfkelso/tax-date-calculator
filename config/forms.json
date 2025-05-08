@@ -18,11 +18,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 4,
+            "monthsAfterCalculationBase": 4,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterCalculationBase": 10,
             "dayOfMonth": 15
           }
         },
@@ -31,11 +31,11 @@
             2020
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 5,
+            "monthsAfterCalculationBase": 5,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterCalculationBase": 10,
             "dayOfMonth": 15
           }
         }
@@ -69,11 +69,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -102,11 +102,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -135,21 +135,21 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 4,
+                "monthsAfterCalculationBase": 4,
                 "dayOfMonth": 15
               }
             }
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 10,
+                "monthsAfterCalculationBase": 10,
                 "dayOfMonth": 15
               }
             }
@@ -180,11 +180,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 4,
+            "monthsAfterCalculationBase": 4,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterCalculationBase": 10,
             "dayOfMonth": 15
           }
         }
@@ -213,11 +213,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -246,11 +246,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -279,21 +279,21 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 4,
+                "monthsAfterCalculationBase": 4,
                 "dayOfMonth": 15
               }
             }
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 10,
+                "monthsAfterCalculationBase": 10,
                 "dayOfMonth": 15
               }
             }
@@ -325,11 +325,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -358,11 +358,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 4,
+            "monthsAfterCalculationBase": 4,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterCalculationBase": 10,
             "dayOfMonth": 15
           }
         }
@@ -391,11 +391,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -424,11 +424,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -457,21 +457,21 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 4,
+                "monthsAfterCalculationBase": 4,
                 "dayOfMonth": 15
               }
             }
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 10,
+                "monthsAfterCalculationBase": 10,
                 "dayOfMonth": 15
               }
             }
@@ -632,11 +632,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 4,
+            "monthsAfterCalculationBase": 4,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterCalculationBase": 10,
             "dayOfMonth": 15
           }
         }
@@ -665,11 +665,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 4,
+            "monthsAfterCalculationBase": 4,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterCalculationBase": 10,
             "dayOfMonth": 15
           }
         }
@@ -699,11 +699,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 4,
+            "monthsAfterCalculationBase": 4,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterCalculationBase": 10,
             "dayOfMonth": 15
           }
         }
@@ -732,11 +732,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 4,
+            "monthsAfterCalculationBase": 4,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterCalculationBase": 10,
             "dayOfMonth": 15
           }
         }
@@ -765,11 +765,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -798,11 +798,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -831,21 +831,21 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 4,
+                "monthsAfterCalculationBase": 4,
                 "dayOfMonth": 15
               }
             }
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 10,
+                "monthsAfterCalculationBase": 10,
                 "dayOfMonth": 15
               }
             }
@@ -876,11 +876,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 4,
+            "monthsAfterCalculationBase": 4,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 10,
+            "monthsAfterCalculationBase": 10,
             "dayOfMonth": 15
           }
         }
@@ -909,11 +909,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -942,11 +942,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -975,21 +975,21 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 4,
+                "monthsAfterCalculationBase": 4,
                 "dayOfMonth": 15
               }
             }
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15,
             "fiscalYearExceptions": {
               "06": {
-                "monthsAfterYearEnd": 10,
+                "monthsAfterCalculationBase": 10,
                 "dayOfMonth": 15
               }
             }
@@ -1021,11 +1021,11 @@
             2024
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 3,
+            "monthsAfterCalculationBase": 3,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 9,
+            "monthsAfterCalculationBase": 9,
             "dayOfMonth": 15
           }
         }
@@ -1053,11 +1053,11 @@
             2025
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 5,
+            "monthsAfterCalculationBase": 5,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
+            "monthsAfterCalculationBase": 11,
             "dayOfMonth": 15
           }
         },
@@ -1066,11 +1066,11 @@
             2020
           ],
           "dueDate": {
-            "monthsAfterYearEnd": 7,
+            "monthsAfterCalculationBase": 7,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
+            "monthsAfterCalculationBase": 11,
             "dayOfMonth": 15
           }
         }
