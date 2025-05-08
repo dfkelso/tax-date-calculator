@@ -1033,7 +1033,7 @@
     },
     {
       "formNumber": "990",
-      "formName": "non-profit",
+      "formName": "Return of Organization Exempt From Income Tax",
       "localityType": "federal",
       "locality": "United States",
       "entityType": "corporation",
@@ -1045,24 +1045,6 @@
       "calculationRules": [
         {
           "effectiveYears": [
-            2019,
-            2021,
-            2022,
-            2023,
-            2024,
-            2025
-          ],
-          "dueDate": {
-            "monthsAfterYearEnd": 5,
-            "dayOfMonth": 15
-          },
-          "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
-            "dayOfMonth": 15
-          }
-        },
-        {
-          "effectiveYears": [
             2020
           ],
           "dueDate": {
@@ -1070,65 +1052,17 @@
             "dayOfMonth": 15
           },
           "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
+            "monthsAfterYearEnd": 10,
             "dayOfMonth": 15
           }
         },
         {
           "effectiveYears": [
-            2019,
             2021,
-            2022,
-            2023,
-            2024,
-            2025
+            2022
           ],
           "dueDate": {
             "monthsAfterYearEnd": 5,
-            "dayOfMonth": 15
-          },
-          "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
-            "dayOfMonth": 15
-          }
-        },
-        {
-          "effectiveYears": [
-            2020
-          ],
-          "dueDate": {
-            "monthsAfterYearEnd": 7,
-            "dayOfMonth": 15
-          },
-          "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
-            "dayOfMonth": 15
-          }
-        },
-        {
-          "effectiveYears": [
-            2019,
-            2021,
-            2022,
-            2023,
-            2024,
-            2025
-          ],
-          "dueDate": {
-            "monthsAfterYearEnd": 5,
-            "dayOfMonth": 15
-          },
-          "extensionDueDate": {
-            "monthsAfterYearEnd": 11,
-            "dayOfMonth": 15
-          }
-        },
-        {
-          "effectiveYears": [
-            2020
-          ],
-          "dueDate": {
-            "monthsAfterYearEnd": 7,
             "dayOfMonth": 15
           },
           "extensionDueDate": {
@@ -1136,7 +1070,12 @@
             "dayOfMonth": 15
           }
         }
-      ]
+      ],
+      "extension": {
+        "formNumber": "8868",
+        "formName": "Application for Extension of Time To File an Exempt Organization Return or Excise Taxes Related to Employee Benefit Plans",
+        "piggybackFed": false
+      }
     }
   ]
 }

@@ -53,6 +53,35 @@ class JsonFormManager
     save_json
   end
 
+  # Add this method to the JsonFormManager class
+  def delete_calculation_rule(form_id, rule_index)
+    form_id = form_id.to_i
+    form_index = form_id - 1
+    rule_index = rule_index.to_i
+
+    Rails.logger.info("Deleting rule #{rule_index} from form #{form_id} (index #{form_index})")
+
+    # Ensure form exists
+    return false if form_index < 0 || form_index >= @data['forms'].length
+
+    # Get the form
+    form = @data['forms'][form_index]
+
+    # Ensure form has calculationRules array
+    form['calculationRules'] ||= []
+
+    # Ensure rule index is valid
+    return false if rule_index < 0 || rule_index >= form['calculationRules'].length
+
+    # Remove the rule
+    form['calculationRules'].delete_at(rule_index)
+
+    # Save changes
+    Rails.logger.info("After deletion, form has #{form['calculationRules'].length} rules")
+    save_json
+  end
+
+
   def export_json
     JSON.pretty_generate(@data)
   end
