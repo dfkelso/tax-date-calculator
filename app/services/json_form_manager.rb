@@ -22,13 +22,25 @@ class JsonFormManager
 
   def update_form(id, form_data)
     id = id.to_i
-    index = id - 1
-    return false if index < 0 || index >= all_forms.length
+    index = id - 1  # Convert ID to array index
 
-    # Make a deep copy to avoid reference issues
-    @data['forms'][index] = JSON.parse(form_data.to_json)
+    Rails.logger.info("Updating form at index #{index}")
+    Rails.logger.info("Form data before updating: #{@data['forms'][index].inspect}")
 
-    # Save to file
+    return false if index < 0 || index >= @data['forms'].length
+
+    # Deep copy using JSON serialization to avoid reference issues
+    form_data_copy = JSON.parse(form_data.to_json)
+
+    # Ensure calculationRules is an array
+    form_data_copy['calculationRules'] ||= []
+
+    # Update the form in the data structure
+    @data['forms'][index] = form_data_copy
+
+    Rails.logger.info("Form data after updating: #{@data['forms'][index].inspect}")
+
+    # Save changes to file
     save_json
   end
 

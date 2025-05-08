@@ -276,7 +276,7 @@ class Admin::FormsController < Admin::BaseController
         years: years_to_cover,
         form_details: form_data,
         suggested_rules: suggested_rules
-      }, expires_in: 2.hours) # Increase cache time to 2 hours
+      }, expires_in: Rails.application.config.ai_rules_expiration || 1.week) # Use 1 week default
 
       # Redirect to confirmation page with the cache key
       redirect_to confirm_ai_rules_admin_form_path(params[:id], cache_key: cache_key)
@@ -298,7 +298,8 @@ class Admin::FormsController < Admin::BaseController
     end
 
     # Refresh the cache to extend its lifetime
-    Rails.cache.write(cache_key, @cached_data, expires_in: 2.hours)
+    Rails.cache.write(cache_key, @cached_data,
+                      expires_in: Rails.application.config.ai_rules_expiration || 1.week)
 
     @form_id = @cached_data[:form_id]
     @years = @cached_data[:years]
@@ -310,105 +311,90 @@ class Admin::FormsController < Admin::BaseController
   end
   # In app/controllers/admin/forms_controller.rb
   def apply_ai_rules
-    Rails.logger.info("=== STARTING apply_ai_rules for form ID: #{params[:id]} ===")
+    Rails.logger.info("===== DIRECT UPDATE METHOD =====")
 
-    # Get the form
-    @form = @form_manager.find_form(params[:id])
-    Rails.logger.info("Found form: #{!@form.nil?}")
+    # Get the form data directly from the JSON file to ensure we're working with the latest data
+    json_path = Rails.root.join('config', 'forms.json')
+    data = JSON.parse(File.read(json_path))
 
-    unless @form
-      flash[:alert] = "Form not found."
-      redirect_to admin_forms_path
-      return
-    end
+    # Get form index (0-based)
+    form_index = params[:id].to_i - 1
+    form = data['forms'][form_index]
 
-    # Print original form data
-    Rails.logger.info("Original form: #{@form.inspect}")
+    Rails.logger.info("Processing form: #{form['formNumber']}")
 
-    # Clear existing rules if requested
-    if params[:replace_existing] == "1"
-      Rails.logger.info("Replacing existing rules")
-      @form['calculationRules'] = []
-    else
-      Rails.logger.info("Adding to existing rules")
-      @form['calculationRules'] ||= []
-    end
+    # Ensure the form has a calculationRules array
+    form['calculationRules'] ||= []
 
-    # Find all selected years
-    selected_years = []
-    params.each_key do |key|
-      if key.start_with?('include_year_') && params[key] == '1'
-        year = key.sub('include_year_', '').to_i
-        selected_years << year
-      end
-    end
+    # Get selected years and rules
+    selected_years = params.keys.select { |k| k.start_with?('include_year_') && params[k] == '1' }
+                           .map { |k| k.sub('include_year_', '').to_i }
+
     Rails.logger.info("Selected years: #{selected_years.inspect}")
 
-    # Create rules directly
-    new_rules = []
-
-    # Group by common configuration
+    # Group rules by configuration to avoid duplication
     rule_groups = {}
 
     selected_years.each do |year|
-      next unless params.dig('rules', year.to_s)
-
-      # Extract rule data
       rule_data = params.dig('rules', year.to_s)
+      next unless rule_data
 
-      # Convert to proper format with integers
-      processed_rule = {
-        'dueDate' => {
-          'monthsAfterYearEnd' => rule_data['dueDate']['monthsAfterYearEnd'].to_i,
-          'dayOfMonth' => rule_data['dueDate']['dayOfMonth'].to_i
-        },
-        'extensionDueDate' => {
-          'monthsAfterYearEnd' => rule_data['extensionDueDate']['monthsAfterYearEnd'].to_i,
-          'dayOfMonth' => rule_data['extensionDueDate']['dayOfMonth'].to_i
+      # Create rule configuration key
+      key = {
+        due_months: rule_data.dig('dueDate', 'monthsAfterYearEnd'),
+        due_day: rule_data.dig('dueDate', 'dayOfMonth'),
+        ext_months: rule_data.dig('extensionDueDate', 'monthsAfterYearEnd'),
+        ext_day: rule_data.dig('extensionDueDate', 'dayOfMonth')
+      }.to_json
+
+      # Group years with the same rule configuration
+      rule_groups[key] ||= {
+        years: [],
+        config: {
+          due_months: rule_data.dig('dueDate', 'monthsAfterYearEnd').to_i,
+          due_day: rule_data.dig('dueDate', 'dayOfMonth').to_i,
+          ext_months: rule_data.dig('extensionDueDate', 'monthsAfterYearEnd').to_i,
+          ext_day: rule_data.dig('extensionDueDate', 'dayOfMonth').to_i
         }
       }
 
-      # Create a key for grouping rules
-      key = processed_rule.to_json
-
-      # Add to group
-      rule_groups[key] ||= []
-      rule_groups[key] << year
-
-      Rails.logger.info("Processed rule for year #{year}: #{processed_rule.inspect}")
+      rule_groups[key][:years] << year
     end
 
-    # Create the final rules
-    rule_groups.each do |key, years|
-      rule = JSON.parse(key)
-      rule['effectiveYears'] = years.sort
+    Rails.logger.info("Rule groups: #{rule_groups.inspect}")
+
+    # Create new rules from groups
+    new_rules = []
+    rule_groups.each do |_, group|
+      rule = {
+        'effectiveYears' => group[:years],
+        'dueDate' => {
+          'monthsAfterYearEnd' => group[:config][:due_months],
+          'dayOfMonth' => group[:config][:due_day]
+        },
+        'extensionDueDate' => {
+          'monthsAfterYearEnd' => group[:config][:ext_months],
+          'dayOfMonth' => group[:config][:ext_day]
+        }
+      }
 
       new_rules << rule
-      @form['calculationRules'] << rule
-
-      Rails.logger.info("Added rule: #{rule.inspect}")
     end
 
-    Rails.logger.info("Form after adding rules: #{@form.inspect}")
+    # Add new rules to the form
+    Rails.logger.info("Adding #{new_rules.size} new rules")
+    form['calculationRules'] = form['calculationRules'] + new_rules
 
-    # Save the form
-    result = @form_manager.update_form(params[:id], @form)
-    Rails.logger.info("Save result: #{result}")
+    # Write the entire JSON back to file directly
+    Rails.logger.info("Writing directly to JSON file")
+    File.write(json_path, JSON.pretty_generate(data))
 
-    if result
-      flash[:notice] = "Successfully added #{new_rules.size} calculation rules."
-    else
-      flash[:alert] = "Error saving calculation rules."
-    end
+    # Verify the changes
+    verify_data = JSON.parse(File.read(json_path))
+    verify_form = verify_data['forms'][form_index]
+    Rails.logger.info("Verification - rules count: #{verify_form['calculationRules'].size}")
 
-    # Final verification
-    updated_form = @form_manager.find_form(params[:id])
-    if updated_form
-      Rails.logger.info("Form after reload: #{updated_form.inspect}")
-    else
-      Rails.logger.error("Could not reload form after update!")
-    end
-
+    flash[:notice] = "Successfully added #{new_rules.size} calculation rules."
     redirect_to edit_admin_form_path(params[:id])
   end
   def fill_missing_years
@@ -587,102 +573,7 @@ class Admin::FormsController < Admin::BaseController
 
     redirect_to edit_admin_form_path(params[:id])
   end
-  def apply_ai_rules
-    # Get the cache key and retrieve data
-    cache_key = params[:cache_key]
-    cached_data = Rails.cache.read(cache_key)
 
-    unless cached_data
-      flash[:alert] = "The suggested rules have expired. Please try again."
-      redirect_to edit_admin_form_path(params[:id])
-      return
-    end
-
-    # Get the form
-    @form = @form_manager.find_form(params[:id])
-
-    unless @form
-      flash[:alert] = "Form not found."
-      redirect_to admin_forms_path
-      return
-    end
-
-    # Clear existing rules if requested
-    @form['calculationRules'] = [] if params[:replace_existing] == "1"
-    @form['calculationRules'] ||= []
-
-    # Parse the rules from params
-    rules_to_apply = {}
-
-    params.each do |key, value|
-      if key.start_with?('rules')
-        # Extract the year and rule parts from the parameter key
-        # Format: rules[2023][dueDate][monthsAfterYearEnd]
-        match = key.match(/rules\[(.*?)\]/)
-        if match
-          year = match[1]
-
-          # Only process years that were selected
-          if params["include_year_#{year}"] == "1"
-            rules_to_apply[year] ||= {}
-
-            # Extract the rest of the parameter key
-            rule_part = key.sub("rules[#{year}]", '')
-
-            # Build a nested structure based on the parameter key
-            current = rules_to_apply[year]
-            parts = rule_part.scan(/\[(.*?)\]/).flatten
-
-            # Navigate to the correct location in the nested structure
-            parts.each_with_index do |part, index|
-              if index == parts.length - 1
-                # This is the last part, set the value
-                current[part] = value
-              else
-                # This is an intermediate part, ensure the nested structure exists
-                current[part] ||= {}
-                current = current[part]
-              end
-            end
-          end
-        end
-      end
-    end
-
-    # Group rules by their configuration
-    grouped_rules = {}
-
-    rules_to_apply.each do |year, rule|
-      # Generate a unique key based on the rule configuration
-      rule_config = rule.to_json
-
-      grouped_rules[rule_config] ||= {
-        'rule' => rule,
-        'years' => []
-      }
-
-      grouped_rules[rule_config]['years'] << year.to_i
-    end
-
-    # Add each unique rule with its years to the form
-    grouped_rules.each do |_, group_data|
-      rule = group_data['rule']
-      rule['effectiveYears'] = group_data['years'].sort
-      @form['calculationRules'] << rule
-    end
-
-    # Save the updated form
-    if @form_manager.update_form(params[:id], @form)
-      # Clean up the cache
-      Rails.cache.delete(cache_key)
-
-      flash[:notice] = "Successfully added AI-generated rules."
-    else
-      flash[:alert] = "Error updating form rules."
-    end
-
-    redirect_to edit_admin_form_path(params[:id])
-  end
 
   def update_calculation_rules
     @form = @form_manager.find_form(params[:id])
