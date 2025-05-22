@@ -66,4 +66,4 @@ end
 
 gem "jsbundling-rails", "~> 1.3"
 gem "react-rails", "~> 3.2"
-gem 'anthropic', '~> 0.2.0'
+gem 'anthropic', '~> 1.0.0'
